@@ -1,6 +1,6 @@
-import { inspectDraft } from './draft'
-import { parsePuzzle } from './puzzleFormat'
-import type { Puzzle } from './types'
+import { inspectDraft } from './draft.ts'
+import { parsePuzzle } from './puzzleFormat.ts'
+import type { Puzzle } from './types.ts'
 
 /** Builds a Puzzle from Puzzle-file text, failing loudly if the fixture is not a valid Puzzle. */
 export function puzzleFrom(text: string): Puzzle {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { canUndo, drag, isPlaySolved, reset, startPlay, tap, undo } from './play'
-import { FOUR_BY_FOUR } from './testing'
+import { canUndo, drag, isPlaySolved, reset, startPlay, tap, undo } from './play.ts'
+import { FOUR_BY_FOUR } from './testing.ts'
 
 const at = (row: number, col: number) => ({ row, col })
 

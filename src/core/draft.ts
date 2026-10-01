@@ -1,7 +1,7 @@
-import { puzzleId } from './identity'
-import { MAX_SIZE, MIN_SIZE } from './rules'
-import { findSolutions } from './solver'
-import type { Coord, DraftGrid, Puzzle, RegionGrid, RegionId, Solution } from './types'
+import { puzzleId } from './identity.ts'
+import { MAX_SIZE, MIN_SIZE } from './rules.ts'
+import { findSolutions } from './solver.ts'
+import type { Coord, DraftGrid, Puzzle, RegionGrid, RegionId, Solution } from './types.ts'
 
 export type DraftProblem =
   | { readonly kind: 'sizeOutOfRange'; readonly size: number }

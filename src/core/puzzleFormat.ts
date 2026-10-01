@@ -1,4 +1,4 @@
-import type { DraftGrid, RegionId } from './types'
+import type { DraftGrid, RegionId } from './types.ts'
 
 const FIRST_LETTER_CODE = 'A'.charCodeAt(0)
 const UNASSIGNED = '.'

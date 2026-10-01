@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatPuzzle, parsePuzzle } from './puzzleFormat'
+import { formatPuzzle, parsePuzzle } from './puzzleFormat.ts'
 
 describe('parsePuzzle', () => {
   it('reads each letter as the Region of its Cell', () => {

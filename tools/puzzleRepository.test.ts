@@ -2,7 +2,7 @@ import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { createPuzzleRepository, type PuzzleRepository } from './puzzleRepository'
+import { createPuzzleRepository, type PuzzleRepository } from './puzzleRepository.ts'
 
 const FOUR = 'CABB\nCCBB\nCCDD\nDDDD\n'
 const OTHER_FOUR = 'AAAB\nCCBB\nCCCB\nCCDD\n'

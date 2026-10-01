@@ -1,7 +1,7 @@
-import { type DraftProblem, inspectDraft } from './draft'
-import { type ParseError, parsePuzzle } from './puzzleFormat'
-import { comparePuzzleNames, isValidPuzzleName } from './puzzleName'
-import type { Puzzle } from './types'
+import { type DraftProblem, inspectDraft } from './draft.ts'
+import { type ParseError, parsePuzzle } from './puzzleFormat.ts'
+import { comparePuzzleNames, isValidPuzzleName } from './puzzleName.ts'
+import type { Puzzle } from './types.ts'
 
 /** A Puzzle file as stored in the library: `puzzles/<size>/<name>.txt`. */
 export interface PuzzleFile {

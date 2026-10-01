@@ -1,6 +1,6 @@
-import { type Board, type CellState, cellAt, emptyBoard, withCells } from './board'
-import { isSolved } from './conflicts'
-import type { Coord, Puzzle } from './types'
+import { type Board, type CellState, cellAt, emptyBoard, withCells } from './board.ts'
+import { isSolved } from './conflicts.ts'
+import type { Coord, Puzzle } from './types.ts'
 
 /** A player's attempt at a Puzzle: the Board plus the earlier Boards that Undo can return to. */
 export interface Play {

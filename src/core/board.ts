@@ -1,4 +1,4 @@
-import type { Coord } from './types'
+import type { Coord } from './types.ts'
 
 export type CellState = 'empty' | 'mark' | 'queen'
 

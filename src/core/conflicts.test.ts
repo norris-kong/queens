@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { findConflicts, isSolved } from './conflicts'
-import { type Board, emptyBoard, withCells } from './board'
-import { FOUR_BY_FOUR } from './testing'
-import type { Coord } from './types'
+import { findConflicts, isSolved } from './conflicts.ts'
+import { type Board, emptyBoard, withCells } from './board.ts'
+import { FOUR_BY_FOUR } from './testing.ts'
+import type { Coord } from './types.ts'
 
 //   C A B B
 //   C C B B

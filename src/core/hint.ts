@@ -1,5 +1,5 @@
-import type { Board, CellState } from './board'
-import type { Coord, Puzzle } from './types'
+import type { Board, CellState } from './board.ts'
+import type { Coord, Puzzle } from './types.ts'
 
 export type HintKind = 'wrongQueen' | 'wrongMark' | 'placeQueen'
 

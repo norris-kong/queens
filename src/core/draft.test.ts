@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { inspectDraft } from './draft'
-import { parsePuzzle } from './puzzleFormat'
-import type { DraftGrid } from './types'
+import { inspectDraft } from './draft.ts'
+import { parsePuzzle } from './puzzleFormat.ts'
+import type { DraftGrid } from './types.ts'
 
 function grid(text: string): DraftGrid {
   const result = parsePuzzle(text)

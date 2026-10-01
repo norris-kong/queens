@@ -1,4 +1,4 @@
-import { buildCatalog, type PuzzleFile } from './core/catalog'
+import { buildCatalog, type PuzzleFile } from './core/catalog.ts'
 
 /** Every `puzzles/<size>/<name>.txt` file, bundled as raw text at build time. */
 const rawFiles = import.meta.glob<string>('/puzzles/*/*.txt', { query: '?raw', import: 'default', eager: true })

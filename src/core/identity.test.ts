@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { puzzleId } from './identity'
+import { puzzleId } from './identity.ts'
 
 describe('puzzleId', () => {
   const layout = [

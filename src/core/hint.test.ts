@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { type CellState, emptyBoard, withCells } from './board'
-import { getHint } from './hint'
-import { FOUR_BY_FOUR } from './testing'
-import type { Coord } from './types'
+import { type CellState, emptyBoard, withCells } from './board.ts'
+import { getHint } from './hint.ts'
+import { FOUR_BY_FOUR } from './testing.ts'
+import type { Coord } from './types.ts'
 
 // FOUR_BY_FOUR's Solution: (0,1) (1,3) (2,0) (3,2).
 const at = (row: number, col: number): Coord => ({ row, col })

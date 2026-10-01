@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { library } from './puzzleLibrary'
+import { library } from './puzzleLibrary.ts'
 
 describe('the bundled Puzzle library', () => {
   it('holds only valid, distinct Puzzles filed under their own Size', () => {

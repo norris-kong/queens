@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { emptyBoard, withCells } from './board'
-import { createProgressStore, type PuzzleProgress, progressStatus, type StorageLike } from './progress'
-import { FOUR_BY_FOUR } from './testing'
+import { emptyBoard, withCells } from './board.ts'
+import { createProgressStore, type PuzzleProgress, progressStatus, type StorageLike } from './progress.ts'
+import { FOUR_BY_FOUR } from './testing.ts'
 
 /** An in-memory stand-in for the browser's localStorage. */
 function memoryStorage(initial: Record<string, string> = {}): StorageLike & { readonly data: Map<string, string> } {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { elapsedMs, formatSolveTime, pause, resume, stoppedAt } from './solveTime'
+import { elapsedMs, formatSolveTime, pause, resume, stoppedAt } from './solveTime.ts'
 
 describe('Solve Time', () => {
   it('only accumulates while the game is visible', () => {

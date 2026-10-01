@@ -1,4 +1,4 @@
-import type { RegionGrid, Solution } from './types'
+import type { RegionGrid, Solution } from './types.ts'
 
 /** Cell indices (row * size + col) of every row, column and Region: each needs exactly one Queen. */
 function unitsOf(regions: RegionGrid): number[][] {

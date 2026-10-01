@@ -1,5 +1,5 @@
-import { formatPuzzle } from './puzzleFormat'
-import type { RegionGrid, RegionId } from './types'
+import { formatPuzzle } from './puzzleFormat.ts'
+import type { RegionGrid, RegionId } from './types.ts'
 
 /** 53-bit string hash (cyrb53); collisions are negligible at the scale of a puzzle library. */
 function hash53(text: string): string {

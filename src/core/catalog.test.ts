@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildCatalog } from './catalog'
+import { buildCatalog } from './catalog.ts'
 
 const FOUR = 'CABB\nCCBB\nCCDD\nDDDD\n'
 const FOUR_MIRRORED = 'BBAC\nBBCC\nDDCC\nDDDD\n'

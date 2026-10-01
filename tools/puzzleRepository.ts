@@ -1,12 +1,12 @@
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import type { FileRef, PuzzleFile } from '../src/core/catalog'
-import { type DraftProblem, inspectDraft } from '../src/core/draft'
-import { puzzleId } from '../src/core/identity'
-import { type ParseError, formatPuzzle, parsePuzzle } from '../src/core/puzzleFormat'
-import { isValidPuzzleName } from '../src/core/puzzleName'
-import { MAX_SIZE, MIN_SIZE } from '../src/core/rules'
-import type { Puzzle } from '../src/core/types'
+import type { FileRef, PuzzleFile } from '../src/core/catalog.ts'
+import { type DraftProblem, inspectDraft } from '../src/core/draft.ts'
+import { puzzleId } from '../src/core/identity.ts'
+import { type ParseError, formatPuzzle, parsePuzzle } from '../src/core/puzzleFormat.ts'
+import { isValidPuzzleName } from '../src/core/puzzleName.ts'
+import { MAX_SIZE, MIN_SIZE } from '../src/core/rules.ts'
+import type { Puzzle } from '../src/core/types.ts'
 
 export interface SaveRequest {
   readonly size: number

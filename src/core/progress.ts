@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import type { Board } from './board'
-import type { Puzzle } from './types'
+import type { Board } from './board.ts'
+import type { Puzzle } from './types.ts'
 
 /** What is kept for one Puzzle between visits. */
 export interface PuzzleProgress {
