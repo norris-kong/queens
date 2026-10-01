@@ -1,18 +1,22 @@
 import { buildCatalog, type PuzzleFile } from './core/catalog.ts'
+import { PUZZLE_EXTENSION, SIZE_FOLDER } from './core/puzzleFile.ts'
 
-/** Every `puzzles/<size>/<name>.txt` file, bundled as raw text at build time. */
+// Every puzzles/<folder>/<name>.txt file, bundled as raw text at build time.
 const rawFiles = import.meta.glob<string>('/puzzles/*/*.txt', { query: '?raw', import: 'default', eager: true })
 
-const PUZZLE_PATH = /^\/puzzles\/(\d+)\/([^/]+)\.txt$/
-
-function toPuzzleFile([path, text]: [string, string]): PuzzleFile[] {
-  const match = PUZZLE_PATH.exec(path)
-  if (!match) return []
-  return [{ size: Number(match[1]), name: match[2] ?? '', text }]
+function toPuzzleFile(path: string, text: string): PuzzleFile | null {
+  const [, root, folder, file] = path.split('/')
+  if (root !== 'puzzles' || !folder || !SIZE_FOLDER.test(folder) || !file?.endsWith(PUZZLE_EXTENSION)) return null
+  return { size: Number(folder), name: file.slice(0, -PUZZLE_EXTENSION.length), text }
 }
 
-export const library = buildCatalog(Object.entries(rawFiles).flatMap(toPuzzleFile))
+const entries = Object.entries(rawFiles).map(([path, text]) => ({ path, file: toPuzzleFile(path, text) }))
 
-if (library.problems.length > 0) {
-  console.error('Some Puzzle files were left out of the library:', library.problems)
+/** Puzzle files the game cannot place, such as `puzzles/8/x.txt` instead of `puzzles/08/x.txt`. */
+export const misplacedFiles = entries.flatMap(({ path, file }) => (file ? [] : [path]))
+
+export const library = buildCatalog(entries.flatMap(({ file }) => (file ? [file] : [])))
+
+if (library.problems.length > 0 || misplacedFiles.length > 0) {
+  console.error('Some Puzzle files were left out of the library:', { problems: library.problems, misplacedFiles })
 }

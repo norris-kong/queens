@@ -1,3 +1,4 @@
+import { filledGrid, replaceCells } from './grid.ts'
 import type { Coord } from './types.ts'
 
 export type CellState = 'empty' | 'mark' | 'queen'
@@ -6,7 +7,12 @@ export type CellState = 'empty' | 'mark' | 'queen'
 export type Board = readonly (readonly CellState[])[]
 
 export function emptyBoard(size: number): Board {
-  return Array.from({ length: size }, () => Array<CellState>(size).fill('empty'))
+  return filledGrid<CellState>(size, 'empty')
+}
+
+/** True while no Cell holds a Queen or a Mark. */
+export function isBoardEmpty(board: Board): boolean {
+  return board.every((row) => row.every((state) => state === 'empty'))
 }
 
 export function cellAt(board: Board, coord: Coord): CellState | undefined {
@@ -15,6 +21,5 @@ export function cellAt(board: Board, coord: Coord): CellState | undefined {
 
 /** Returns a new Board with the given Cells changed; the original is left untouched. */
 export function withCells(board: Board, changes: readonly { readonly coord: Coord; readonly state: CellState }[]): Board {
-  const changed = new Map(changes.map((change) => [`${change.coord.row},${change.coord.col}`, change.state]))
-  return board.map((cells, row) => cells.map((state, col) => changed.get(`${row},${col}`) ?? state))
+  return replaceCells(board, changes.map(({ coord, state }) => ({ coord, value: state })))
 }

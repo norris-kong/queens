@@ -1,4 +1,4 @@
-import { mkdtemp, rm } from 'node:fs/promises'
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
@@ -20,6 +20,13 @@ afterEach(async () => {
 })
 
 describe('puzzle repository', () => {
+  it('only reads two-digit Size folders, the only ones it ever writes', async () => {
+    await mkdir(join(root, '4'))
+    await writeFile(join(root, '4', 'stray.txt'), FOUR)
+
+    expect(await repository.list()).toEqual([])
+  })
+
   it('saves a new Puzzle so that it is listed under its Size and Puzzle Name', async () => {
     const result = await repository.save({ size: 4, name: 'corner', text: FOUR })
 

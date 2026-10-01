@@ -1,3 +1,4 @@
+import { coordKey } from './grid.ts'
 import { puzzleId } from './identity.ts'
 import { MAX_SIZE, MIN_SIZE } from './rules.ts'
 import { findSolutions } from './solver.ts'
@@ -46,15 +47,14 @@ function isConnected(draft: DraftGrid, region: RegionId): boolean {
   const [start] = members
   if (start === undefined) return true
 
-  const key = (coord: Coord) => `${coord.row},${coord.col}`
-  const reached = new Set([key(start.coord)])
+  const reached = new Set([coordKey(start.coord)])
   const frontier = [start.coord]
   while (frontier.length > 0) {
     const current = frontier.pop() as Coord
     for (const step of ORTHOGONAL_STEPS) {
       const next = { row: current.row + step.row, col: current.col + step.col }
-      if (draft[next.row]?.[next.col] !== region || reached.has(key(next))) continue
-      reached.add(key(next))
+      if (draft[next.row]?.[next.col] !== region || reached.has(coordKey(next))) continue
+      reached.add(coordKey(next))
       frontier.push(next)
     }
   }
@@ -65,30 +65,42 @@ function findDisconnectedRegions(draft: DraftGrid): RegionId[] {
   return Array.from({ length: draft.length }, (_, region) => region).filter((region) => !isConnected(draft, region))
 }
 
-function findStructuralProblems(draft: DraftGrid): DraftProblem[] {
+/** Problems with how Cells are assigned to Regions. Only the first two keep Solutions from being counted. */
+function findLayoutProblems(draft: DraftGrid): { readonly blocking: DraftProblem[]; readonly disconnected: DraftProblem[] } {
   const unassigned = findUnassignedCells(draft)
   const missing = findMissingRegions(draft)
   const disconnected = findDisconnectedRegions(draft)
-  return [
-    ...(unassigned.length > 0 ? [{ kind: 'unassignedCells', cells: unassigned } as const] : []),
-    ...(missing.length > 0 ? [{ kind: 'missingRegions', regions: missing } as const] : []),
-    ...(disconnected.length > 0 ? [{ kind: 'disconnectedRegions', regions: disconnected } as const] : []),
-  ]
+  return {
+    blocking: [
+      ...(unassigned.length > 0 ? [{ kind: 'unassignedCells', cells: unassigned } as const] : []),
+      ...(missing.length > 0 ? [{ kind: 'missingRegions', regions: missing } as const] : []),
+    ],
+    disconnected: disconnected.length > 0 ? [{ kind: 'disconnectedRegions', regions: disconnected }] : [],
+  }
 }
 
-/** Checks a Draft against every Puzzle condition and, when it meets them all, returns the Puzzle. */
+function solutionProblems(solutions: readonly Solution[]): DraftProblem[] {
+  const [first, second] = solutions
+  if (first === undefined) return [{ kind: 'noSolution' }]
+  return second === undefined ? [] : [{ kind: 'multipleSolutions', solutions: [first, second] }]
+}
+
+/**
+ * Checks a Draft against every Puzzle condition and, when it meets them all, returns the Puzzle.
+ * Solutions are counted as soon as every Cell is assigned and all N Regions are used, even if a
+ * Region is still split, so the author sees both problems at once.
+ */
 export function inspectDraft(draft: DraftGrid): DraftInspection {
   const size = draft.length
   if (size < MIN_SIZE || size > MAX_SIZE) return { valid: false, problems: [{ kind: 'sizeOutOfRange', size }] }
 
-  const structural = findStructuralProblems(draft)
-  if (structural.length > 0) return { valid: false, problems: structural }
+  const layout = findLayoutProblems(draft)
+  if (layout.blocking.length > 0) return { valid: false, problems: [...layout.blocking, ...layout.disconnected] }
 
   const regions = draft as RegionGrid
-  const [first, second] = findSolutions(regions, SOLUTIONS_TO_FIND)
-  if (first === undefined) return { valid: false, problems: [{ kind: 'noSolution' }] }
-  if (second !== undefined) {
-    return { valid: false, problems: [{ kind: 'multipleSolutions', solutions: [first, second] }] }
-  }
-  return { valid: true, puzzle: { id: puzzleId(regions), size, regions, solution: first } }
+  const solutions = findSolutions(regions, SOLUTIONS_TO_FIND)
+  const problems = [...layout.disconnected, ...solutionProblems(solutions)]
+  const [solution] = solutions
+  if (problems.length > 0 || solution === undefined) return { valid: false, problems }
+  return { valid: true, puzzle: { id: puzzleId(regions), size, regions, solution } }
 }

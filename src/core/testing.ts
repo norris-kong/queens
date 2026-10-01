@@ -1,14 +1,11 @@
-import { inspectDraft } from './draft.ts'
-import { parsePuzzle } from './puzzleFormat.ts'
+import { readPuzzle } from './puzzleFile.ts'
 import type { Puzzle } from './types.ts'
 
 /** Builds a Puzzle from Puzzle-file text, failing loudly if the fixture is not a valid Puzzle. */
 export function puzzleFrom(text: string): Puzzle {
-  const parsed = parsePuzzle(text)
-  if (!parsed.ok) throw new Error(`fixture does not parse: ${parsed.error.kind}`)
-  const inspection = inspectDraft(parsed.grid)
-  if (!inspection.valid) throw new Error(`fixture is not a Puzzle: ${inspection.problems.map((p) => p.kind).join(', ')}`)
-  return inspection.puzzle
+  const read = readPuzzle(text)
+  if (!read.ok) throw new Error(`fixture is not a Puzzle: ${JSON.stringify(read)}`)
+  return read.puzzle
 }
 
 /**

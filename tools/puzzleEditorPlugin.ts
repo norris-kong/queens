@@ -1,10 +1,8 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { Plugin } from 'vite'
 import { z } from 'zod'
-import { createPuzzleRepository, type PuzzleRepository, type RepositoryResult } from './puzzleRepository.ts'
-
-/** Where the editor's requests go; only the dev server answers them. */
-export const EDITOR_API_PATH = '/__editor/puzzles'
+import { EDITOR_API_PATH, type EditorResult } from '../src/ui/editor/editorProtocol.ts'
+import { createPuzzleRepository, type PuzzleRepository } from './puzzleRepository.ts'
 
 const MAX_BODY_BYTES = 16 * 1024
 
@@ -36,13 +34,14 @@ async function readJson(request: IncomingMessage): Promise<unknown> {
   }
 }
 
-function send(response: ServerResponse, status: number, body: unknown): void {
+function send(response: ServerResponse, status: number, body: EditorResult): void {
   response.statusCode = status
   response.setHeader('Content-Type', 'application/json')
   response.end(JSON.stringify(body))
 }
 
-async function handle(repository: PuzzleRepository, request: IncomingMessage): Promise<RepositoryResult> {
+/** Every repository outcome is sent as-is, so its error kinds must be ones the editor understands. */
+async function handle(repository: PuzzleRepository, request: IncomingMessage): Promise<EditorResult> {
   const body = await readJson(request)
   if (request.url === '/save') {
     const parsed = saveSchema.safeParse(body)
@@ -66,14 +65,15 @@ export function puzzleEditorPlugin(puzzlesDir: string): Plugin {
       const repository = createPuzzleRepository(puzzlesDir)
       server.middlewares.use(EDITOR_API_PATH, (request, response) => {
         if (request.method !== 'POST') {
-          send(response, 405, { ok: false, error: { kind: 'badRequest', message: 'POST only' } })
+          send(response, 405, { ok: false, error: { kind: 'badRequest' } })
           return
         }
         handle(repository, request)
           .then((result) => send(response, result.ok ? 200 : 422, result))
           .catch((error: unknown) => {
             if (error instanceof BadRequest) {
-              send(response, 400, { ok: false, error: { kind: 'badRequest', message: error.message } })
+              server.config.logger.warn(`[puzzle editor] bad request: ${error.message}`)
+              send(response, 400, { ok: false, error: { kind: 'badRequest' } })
               return
             }
             server.config.logger.error(`[puzzle editor] ${String(error)}`)

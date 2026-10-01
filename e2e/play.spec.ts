@@ -24,16 +24,28 @@ test('a player solves a Puzzle and sees it ticked in the list', async ({ page })
   await page.goto('./')
   await page.locator(`a[href="${target.path}"]`).click()
 
+  // Asking twice before the next Move counts as one Hint.
+  await page.getByRole('button', { name: '提示' }).click()
+  await page.getByRole('button', { name: '提示' }).click()
   for (const coord of target.solution) {
     await cell(page, coord).click()
     await cell(page, coord).click()
   }
 
-  await expect(page.getByRole('heading', { name: '完成！' })).toBeVisible()
-  await expect(page.getByText(/解題時間 \d+:\d\d · 使用提示 0 次/)).toBeVisible()
+  await expect(page.getByRole('heading', { name: '通關！' })).toBeVisible()
+  await expect(page.getByText(/解題時間 \d+:\d\d · 使用提示 1 次/)).toBeVisible()
 
   await page.getByRole('link', { name: '‹ 題目列表' }).click()
-  await expect(page.locator(`a[href="${target.path}"]`)).toContainText('已完成')
+  await expect(page.locator(`a[href="${target.path}"]`)).toContainText('已通關')
+})
+
+test('opening a Puzzle without playing it does not mark it in progress', async ({ page }) => {
+  await page.goto(target.path)
+  await expect(cell(page, { row: 0, col: 0 })).toBeVisible()
+
+  await page.getByRole('link', { name: '‹ 題目列表' }).click()
+
+  await expect(page.locator(`a[href="${target.path}"]`)).not.toContainText('進行中')
 })
 
 test('a player marks with a drag, then undoes and resets', async ({ page }) => {

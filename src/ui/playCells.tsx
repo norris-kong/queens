@@ -1,12 +1,11 @@
 import type { Board, CellState } from '../core/board.ts'
 import { findConflicts } from '../core/conflicts.ts'
+import { coordKey as key } from '../core/grid.ts'
 import type { Hint } from '../core/hint.ts'
 import type { Coord, Puzzle } from '../core/types.ts'
 import { strings } from '../strings.ts'
-import type { CellView } from './BoardGrid.tsx'
+import type { CellView } from './BoardView.tsx'
 import { MarkIcon, QueenIcon } from './icons.tsx'
-
-const key = ({ row, col }: Coord) => `${row},${col}`
 
 export interface Highlights {
   readonly striped: ReadonlySet<string>
@@ -16,7 +15,7 @@ export interface Highlights {
 export function highlightsFor(puzzle: Puzzle, board: Board): Highlights {
   const conflicts = findConflicts(puzzle, board)
   return {
-    striped: new Set(conflicts.flatMap((conflict) => conflict.area.map(key))),
+    striped: new Set(conflicts.flatMap((conflict) => conflict.cells.map(key))),
     conflictingQueens: new Set(conflicts.flatMap((conflict) => conflict.queens.map(key))),
   }
 }

@@ -5,14 +5,14 @@ import { shownName } from './libraryLookup.ts'
 import { progressStore } from './progressStorage.ts'
 import { routeHash } from './routes.ts'
 
-const STATUS_TEXT = { completed: strings.statusCompleted, inProgress: strings.statusInProgress, new: '' } as const
+const STATUS_TEXT = { solved: strings.statusSolved, inProgress: strings.statusInProgress, new: '' } as const
 
 export function HomePage() {
   return (
     <main className="page">
       <header className="page-header">
         <h1>{strings.appTitle}</h1>
-        <nav style={{ display: 'flex', gap: 16 }}>
+        <nav className="header-links">
           <a href={routeHash({ page: 'rules' })}>{strings.rulesLink}</a>
           {import.meta.env.DEV && <a href={routeHash({ page: 'editor' })}>{strings.editorLink}</a>}
         </nav>
@@ -31,10 +31,7 @@ export function HomePage() {
                   <a className="puzzle-link" href={routeHash({ page: 'play', size: group.size, name: entry.name })}>
                     <span>{strings.puzzleLabel(entry.number, shownName(entry))}</span>
                     {status !== 'new' && (
-                      <span className={`status status-${status}`}>
-                        {status === 'completed' ? '✓ ' : '● '}
-                        {STATUS_TEXT[status]}
-                      </span>
+                      <span className={`status status-${status}`}>{STATUS_TEXT[status]}</span>
                     )}
                   </a>
                 </li>

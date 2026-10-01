@@ -1,41 +1,32 @@
-/** Mirrors the dev server's editor endpoints (tools/puzzleEditorPlugin.ts). */
-const API_PATH = '/__editor/puzzles'
+import { EDITOR_API_PATH, type EditorResult, editorResultSchema } from './editorProtocol.ts'
 
-export type EditorErrorKind =
-  | 'invalidName'
-  | 'invalidSize'
-  | 'unreadable'
-  | 'notAPuzzle'
-  | 'wrongSize'
-  | 'nameTaken'
-  | 'duplicate'
-  | 'notFound'
-  | 'badRequest'
-  | 'serverError'
-  | 'network'
-
-export interface EditorError {
-  readonly kind: EditorErrorKind
-  readonly sameAs?: { readonly size: number; readonly name: string }
+export interface SaveRequest {
+  readonly size: number
+  readonly name: string
+  readonly text: string
+  readonly previousName?: string
 }
 
-export type EditorResult = { readonly ok: true } | { readonly ok: false; readonly error: EditorError }
-
 async function post(action: 'save' | 'delete', body: unknown): Promise<EditorResult> {
+  let response: Response
   try {
-    const response = await fetch(`${API_PATH}/${action}`, {
+    response = await fetch(`${EDITOR_API_PATH}/${action}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     })
-    return (await response.json()) as EditorResult
   } catch (error) {
-    console.error(`Editor ${action} request failed`, error)
+    console.error(`Editor ${action} request could not reach the dev server`, error)
     return { ok: false, error: { kind: 'network' } }
   }
+  // Never trust the response shape: anything unexpected is reported as a server error.
+  const parsed = editorResultSchema.safeParse(await response.json().catch(() => null))
+  if (parsed.success) return parsed.data
+  console.error(`Editor ${action} got an unexpected response (HTTP ${response.status})`, parsed.error.issues)
+  return { ok: false, error: { kind: 'serverError' } }
 }
 
 export const editorApi = {
-  save: (request: { size: number; name: string; text: string; previousName?: string }) => post('save', request),
+  save: (request: SaveRequest) => post('save', request),
   remove: (size: number, name: string) => post('delete', { size, name }),
 }

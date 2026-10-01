@@ -1,7 +1,7 @@
 import type { Board, CellState } from './board.ts'
 import type { Coord, Puzzle } from './types.ts'
 
-export type HintKind = 'wrongQueen' | 'wrongMark' | 'placeQueen'
+export type HintKind = 'misplacedQueen' | 'misplacedMark' | 'placeQueen'
 
 /** A Hint marks one Cell; it never changes the Board. */
 export interface Hint {
@@ -21,11 +21,11 @@ export function getHint(puzzle: Puzzle, board: Board): Hint | null {
   const inSolution = (coord: Coord) => puzzle.solution[coord.row] === coord.col
   const cells = cellsIn(board)
 
-  const wrongQueen = cells.find((cell) => cell.state === 'queen' && !inSolution(cell.coord))
-  if (wrongQueen) return { kind: 'wrongQueen', cell: wrongQueen.coord }
+  const misplacedQueen = cells.find((cell) => cell.state === 'queen' && !inSolution(cell.coord))
+  if (misplacedQueen) return { kind: 'misplacedQueen', cell: misplacedQueen.coord }
 
-  const wrongMark = cells.find((cell) => cell.state === 'mark' && inSolution(cell.coord))
-  if (wrongMark) return { kind: 'wrongMark', cell: wrongMark.coord }
+  const misplacedMark = cells.find((cell) => cell.state === 'mark' && inSolution(cell.coord))
+  if (misplacedMark) return { kind: 'misplacedMark', cell: misplacedMark.coord }
 
   const missingQueen = cells.find((cell) => cell.state !== 'queen' && inSolution(cell.coord))
   return missingQueen ? { kind: 'placeQueen', cell: missingQueen.coord } : null

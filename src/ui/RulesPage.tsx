@@ -1,9 +1,8 @@
 import { type Board, type CellState, emptyBoard, withCells } from '../core/board.ts'
-import { inspectDraft } from '../core/draft.ts'
-import { parsePuzzle } from '../core/puzzleFormat.ts'
+import { readPuzzle } from '../core/puzzleFile.ts'
 import type { Coord, Puzzle } from '../core/types.ts'
 import { strings } from '../strings.ts'
-import { BoardGrid } from './BoardGrid.tsx'
+import { BoardView } from './BoardView.tsx'
 import { cellView, highlightsFor } from './playCells.tsx'
 import { routeHash } from './routes.ts'
 
@@ -11,26 +10,32 @@ import { routeHash } from './routes.ts'
 const EXAMPLE_LAYOUT = 'AABBC\nDDBCC\nDDDCC\nDDDCC\nDDDEC'
 
 function examplePuzzle(): Puzzle | null {
-  const parsed = parsePuzzle(EXAMPLE_LAYOUT)
-  const inspection = parsed.ok ? inspectDraft(parsed.grid) : null
-  return inspection?.valid ? inspection.puzzle : null
+  const read = readPuzzle(EXAMPLE_LAYOUT)
+  if (read.ok) return read.puzzle
+  console.error('The rules-page example layout is not a valid Puzzle; examples are hidden', read)
+  return null
 }
 
 const at = (row: number, col: number): Coord => ({ row, col })
 const place = (state: CellState, ...cells: Coord[]) => cells.map((coord) => ({ coord, state }))
 
-const EXAMPLES: readonly { readonly caption: string; readonly board: Board }[] = [
+/** Each example's Queens and Marks on the 5×5 example layout. */
+const EXAMPLES: readonly { readonly caption: string; readonly cells: ReturnType<typeof place> }[] = [
   {
     caption: strings.examples.row,
-    board: withCells(emptyBoard(5), [...place('queen', at(2, 1)), ...place('mark', at(2, 0), at(2, 2), at(2, 3), at(2, 4))]),
+    cells: [...place('queen', at(2, 1)), ...place('mark', at(2, 0), at(2, 2), at(2, 3), at(2, 4))],
   },
   {
     caption: strings.examples.column,
-    board: withCells(emptyBoard(5), [...place('queen', at(2, 1)), ...place('mark', at(0, 1), at(1, 1), at(3, 1), at(4, 1))]),
+    cells: [...place('queen', at(2, 1)), ...place('mark', at(0, 1), at(1, 1), at(3, 1), at(4, 1))],
   },
-  { caption: strings.examples.region, board: withCells(emptyBoard(5), place('queen', at(0, 4), at(3, 3))) },
-  { caption: strings.examples.adjacent, board: withCells(emptyBoard(5), place('queen', at(1, 2), at(2, 1))) },
+  { caption: strings.examples.region, cells: place('queen', at(0, 4), at(3, 3)) },
+  { caption: strings.examples.adjacent, cells: place('queen', at(1, 2), at(2, 1)) },
 ]
+
+function exampleBoard(puzzle: Puzzle, cells: ReturnType<typeof place>): Board {
+  return withCells(emptyBoard(puzzle.size), cells)
+}
 
 export function RulesPage() {
   const puzzle = examplePuzzle()
@@ -55,14 +60,15 @@ export function RulesPage() {
           <h2>{strings.examplesTitle}</h2>
           <div className="examples">
             {EXAMPLES.map((example) => {
-              const highlights = highlightsFor(puzzle, example.board)
+              const board = exampleBoard(puzzle, example.cells)
+              const highlights = highlightsFor(puzzle, board)
               return (
                 <figure key={example.caption} className="example">
-                  <BoardGrid
+                  <BoardView
                     regions={puzzle.regions}
                     label={example.caption}
                     disabled
-                    renderCell={(cell) => cellView(example.board, highlights, null, false, cell)}
+                    renderCell={(cell) => cellView(board, highlights, null, false, cell)}
                   />
                   <figcaption>{example.caption}</figcaption>
                 </figure>

@@ -24,7 +24,7 @@ describe('findConflicts', () => {
       {
         kind: 'region',
         queens: [at(2, 2), at(3, 0)],
-        area: [at(2, 2), at(2, 3), at(3, 0), at(3, 1), at(3, 2), at(3, 3)],
+        cells: [at(2, 2), at(2, 3), at(3, 0), at(3, 1), at(3, 2), at(3, 3)],
       },
     ])
   })
@@ -33,7 +33,7 @@ describe('findConflicts', () => {
     const conflicts = findConflicts(FOUR_BY_FOUR, queensAt(at(0, 0), at(0, 2)))
 
     expect(conflicts).toEqual([
-      { kind: 'row', queens: [at(0, 0), at(0, 2)], area: [at(0, 0), at(0, 1), at(0, 2), at(0, 3)] },
+      { kind: 'row', queens: [at(0, 0), at(0, 2)], cells: [at(0, 0), at(0, 1), at(0, 2), at(0, 3)] },
     ])
   })
 
@@ -41,14 +41,14 @@ describe('findConflicts', () => {
     const conflicts = findConflicts(FOUR_BY_FOUR, queensAt(at(0, 3), at(2, 3)))
 
     expect(conflicts).toEqual([
-      { kind: 'column', queens: [at(0, 3), at(2, 3)], area: [at(0, 3), at(1, 3), at(2, 3), at(3, 3)] },
+      { kind: 'column', queens: [at(0, 3), at(2, 3)], cells: [at(0, 3), at(1, 3), at(2, 3), at(3, 3)] },
     ])
   })
 
   it('stripes only the two Cells when Queens touch diagonally', () => {
     const conflicts = findConflicts(FOUR_BY_FOUR, queensAt(at(1, 1), at(2, 2)))
 
-    expect(conflicts).toEqual([{ kind: 'adjacent', queens: [at(1, 1), at(2, 2)], area: [at(1, 1), at(2, 2)] }])
+    expect(conflicts).toEqual([{ kind: 'adjacent', queens: [at(1, 1), at(2, 2)], cells: [at(1, 1), at(2, 2)] }])
   })
 
   it('reports both the row and the touching when Queens sit side by side', () => {

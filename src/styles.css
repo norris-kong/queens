@@ -90,6 +90,11 @@ a {
   font-size: 1.25rem;
 }
 
+.header-links {
+  display: flex;
+  gap: 16px;
+}
+
 .back-link {
   font-weight: 600;
   text-decoration: none;
@@ -339,7 +344,7 @@ a {
   font-weight: 700;
 }
 
-.status-completed {
+.status-solved {
   color: #2f9e44;
 }
 

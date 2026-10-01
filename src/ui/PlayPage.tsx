@@ -29,6 +29,7 @@ export function PlayPage({ size, name }: PlayPageProps) {
           puzzle={located.entry.puzzle}
           persist
           onNext={next ? () => navigate({ page: 'play', size: next.size, name: next.entry.name }) : undefined}
+          solvedNote={next ? undefined : strings.lastPuzzle}
         />
       ) : (
         <p>{strings.puzzleNotFound}</p>

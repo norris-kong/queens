@@ -4,7 +4,7 @@ export interface Stopwatch {
   readonly runningSince: number | null
 }
 
-export function stoppedAt(accumulatedMs: number): Stopwatch {
+export function pausedAt(accumulatedMs: number): Stopwatch {
   return { accumulatedMs, runningSince: null }
 }
 
@@ -13,10 +13,10 @@ export function resume(stopwatch: Stopwatch, now: number): Stopwatch {
 }
 
 export function pause(stopwatch: Stopwatch, now: number): Stopwatch {
-  return stopwatch.runningSince === null ? stopwatch : stoppedAt(elapsedMs(stopwatch, now))
+  return stopwatch.runningSince === null ? stopwatch : pausedAt(readSolveTime(stopwatch, now))
 }
 
-export function elapsedMs(stopwatch: Stopwatch, now: number): number {
+export function readSolveTime(stopwatch: Stopwatch, now: number): number {
   const running = stopwatch.runningSince === null ? 0 : Math.max(0, now - stopwatch.runningSince)
   return stopwatch.accumulatedMs + running
 }

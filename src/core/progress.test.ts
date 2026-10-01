@@ -25,7 +25,7 @@ const progress: PuzzleProgress = {
   ]),
   solveTimeMs: 42_000,
   hintsUsed: 2,
-  completed: false,
+  everSolved: false,
 }
 
 describe('progress store', () => {
@@ -84,9 +84,9 @@ describe('progress store', () => {
 describe('progressStatus', () => {
   it.each<[string, string, PuzzleProgress | null]>([
     ['never played', 'new', null],
-    ['opened but untouched', 'new', { ...progress, board: emptyBoard(4), solveTimeMs: 0, hintsUsed: 0 }],
+    ['opened and looked at, without a Move or Hint', 'new', { ...progress, board: emptyBoard(4), hintsUsed: 0 }],
     ['partly played', 'inProgress', progress],
-    ['Solved before, now replaying', 'completed', { ...progress, completed: true }],
+    ['Solved before, now replaying', 'solved', { ...progress, everSolved: true }],
   ])('%s → %s', (_, status, saved) => {
     expect(progressStatus(saved)).toBe(status)
   })

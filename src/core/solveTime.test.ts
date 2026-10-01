@@ -1,22 +1,22 @@
 import { describe, expect, it } from 'vitest'
-import { elapsedMs, formatSolveTime, pause, resume, stoppedAt } from './solveTime.ts'
+import { readSolveTime, formatSolveTime, pause, resume, pausedAt } from './solveTime.ts'
 
 describe('Solve Time', () => {
   it('only accumulates while the game is visible', () => {
-    const shown = resume(stoppedAt(0), 1_000)
+    const shown = resume(pausedAt(0), 1_000)
     const hidden = pause(shown, 4_000)
     const shownAgain = resume(hidden, 10_000)
 
-    expect(elapsedMs(hidden, 9_000)).toBe(3_000)
-    expect(elapsedMs(shownAgain, 12_000)).toBe(5_000)
+    expect(readSolveTime(hidden, 9_000)).toBe(3_000)
+    expect(readSolveTime(shownAgain, 12_000)).toBe(5_000)
   })
 
   it('carries on from a saved time', () => {
-    expect(elapsedMs(resume(stoppedAt(60_000), 0), 2_500)).toBe(62_500)
+    expect(readSolveTime(resume(pausedAt(60_000), 0), 2_500)).toBe(62_500)
   })
 
   it('ignores a resume while already running and a pause while already paused', () => {
-    const running = resume(stoppedAt(0), 1_000)
+    const running = resume(pausedAt(0), 1_000)
 
     expect(resume(running, 5_000)).toBe(running)
     const paused = pause(running, 2_000)

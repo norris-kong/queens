@@ -13,13 +13,13 @@ describe('getHint', () => {
   it('points at a misplaced Queen before anything else', () => {
     const board = boardWith([at(0, 1), 'mark'], [at(1, 1), 'queen'])
 
-    expect(getHint(FOUR_BY_FOUR, board)).toEqual({ kind: 'wrongQueen', cell: at(1, 1) })
+    expect(getHint(FOUR_BY_FOUR, board)).toEqual({ kind: 'misplacedQueen', cell: at(1, 1) })
   })
 
   it('points at a Mark covering the Solution when no Queen is misplaced', () => {
     const board = boardWith([at(0, 1), 'queen'], [at(2, 0), 'mark'], [at(3, 3), 'mark'])
 
-    expect(getHint(FOUR_BY_FOUR, board)).toEqual({ kind: 'wrongMark', cell: at(2, 0) })
+    expect(getHint(FOUR_BY_FOUR, board)).toEqual({ kind: 'misplacedMark', cell: at(2, 0) })
   })
 
   it('points at the next Cell where a Queen belongs when there is no Mistake', () => {

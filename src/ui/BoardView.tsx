@@ -1,6 +1,6 @@
 import type { CSSProperties, KeyboardEvent, ReactNode } from 'react'
 import { REGION_COLORS } from '../config.ts'
-import type { Coord, DraftGrid } from '../core/types.ts'
+import type { Coord, DraftGrid, RegionId } from '../core/types.ts'
 import { type StrokeHandlers, useStroke } from './useStroke.ts'
 
 export interface CellView {
@@ -9,7 +9,7 @@ export interface CellView {
   readonly className?: string
 }
 
-interface BoardGridProps extends Partial<StrokeHandlers> {
+interface BoardViewProps extends Partial<StrokeHandlers> {
   readonly regions: DraftGrid
   readonly label: string
   readonly renderCell: (cell: Coord) => CellView
@@ -52,7 +52,34 @@ function handleKey(event: KeyboardEvent<HTMLDivElement>, cell: Coord, size: numb
   board?.querySelector<HTMLElement>(`[data-row="${row}"][data-col="${col}"]`)?.focus()
 }
 
-export function BoardGrid({
+interface BoardCellProps {
+  readonly regions: DraftGrid
+  readonly cell: Coord
+  readonly region: RegionId | null
+  readonly view: CellView
+  readonly focusable: boolean
+  readonly onKeyDown?: (event: KeyboardEvent<HTMLDivElement>) => void
+}
+
+function BoardCell({ regions, cell, region, view, focusable, onKeyDown }: BoardCellProps) {
+  const color = region === null ? undefined : REGION_COLORS[region]
+  return (
+    <div
+      role="gridcell"
+      aria-label={view.label}
+      data-row={cell.row}
+      data-col={cell.col}
+      tabIndex={focusable ? 0 : -1}
+      className={`cell ${borderClasses(regions, cell)} ${view.className ?? ''}`}
+      style={color ? ({ '--region': color } as CSSProperties) : undefined}
+      onKeyDown={onKeyDown}
+    >
+      {view.content}
+    </div>
+  )
+}
+
+export function BoardView({
   regions,
   label,
   renderCell,
@@ -60,7 +87,7 @@ export function BoardGrid({
   onTap = noop,
   onPreview = noop,
   onCommit = noop,
-}: BoardGridProps) {
+}: BoardViewProps) {
   const size = regions.length
   const { boardRef, onPointerDown, onPointerMove, onPointerUp, onPointerCancel } = useStroke(
     size,
@@ -83,26 +110,17 @@ export function BoardGrid({
       onContextMenu={(event) => event.preventDefault()}
     >
       {regions.flatMap((cells, row) =>
-        cells.map((region, col) => {
-          const cell = { row, col }
-          const view = renderCell(cell)
-          const color = region === null ? undefined : REGION_COLORS[region]
-          return (
-            <div
-              key={`${row}-${col}`}
-              role="gridcell"
-              aria-label={view.label}
-              data-row={row}
-              data-col={col}
-              tabIndex={disabled ? -1 : row === 0 && col === 0 ? 0 : -1}
-              className={`cell ${borderClasses(regions, cell)} ${view.className ?? ''}`}
-              style={color ? ({ '--region': color } as CSSProperties) : undefined}
-              onKeyDown={disabled ? undefined : (event) => handleKey(event, cell, size, onTap)}
-            >
-              {view.content}
-            </div>
-          )
-        }),
+        cells.map((region, col) => (
+          <BoardCell
+            key={`${row}-${col}`}
+            regions={regions}
+            cell={{ row, col }}
+            region={region}
+            view={renderCell({ row, col })}
+            onKeyDown={disabled ? undefined : (event) => handleKey(event, { row, col }, size, onTap)}
+            focusable={!disabled && row === 0 && col === 0}
+          />
+        )),
       )}
     </div>
   )

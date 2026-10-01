@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { Board } from './board.ts'
+import { type Board, isBoardEmpty } from './board.ts'
 import type { Puzzle } from './types.ts'
 
 /** What is kept for one Puzzle between visits. */
@@ -7,8 +7,8 @@ export interface PuzzleProgress {
   readonly board: Board
   readonly solveTimeMs: number
   readonly hintsUsed: number
-  /** Has this Puzzle ever been Solved? Stays true through a replay. */
-  readonly completed: boolean
+  /** Has this Puzzle ever been Solved? Stays true through a replay, and keeps its tick in the list. */
+  readonly everSolved: boolean
 }
 
 /** The part of the browser's Storage the store needs, so tests can pass an in-memory one. */
@@ -21,14 +21,14 @@ export interface ProgressStore {
   forgetAllExcept(puzzleIds: ReadonlySet<string>): void
 }
 
-export type ProgressStatus = 'new' | 'inProgress' | 'completed'
+export type ProgressStatus = 'new' | 'inProgress' | 'solved'
 
 /** How a Puzzle shows in the list: ticked once ever Solved, otherwise whether it has been started. */
 export function progressStatus(progress: PuzzleProgress | null): ProgressStatus {
   if (progress === null) return 'new'
-  if (progress.completed) return 'completed'
-  const started = progress.solveTimeMs > 0 || progress.hintsUsed > 0 || progress.board.flat().some((s) => s !== 'empty')
-  return started ? 'inProgress' : 'new'
+  if (progress.everSolved) return 'solved'
+  // Time spent only looking at a Puzzle does not count as starting it.
+  return progress.hintsUsed > 0 || !isBoardEmpty(progress.board) ? 'inProgress' : 'new'
 }
 
 const KEY_PREFIX = 'queens.progress.'
@@ -37,7 +37,7 @@ const progressSchema = z.object({
   board: z.array(z.array(z.enum(['empty', 'mark', 'queen']))),
   solveTimeMs: z.number().nonnegative(),
   hintsUsed: z.number().int().nonnegative(),
-  completed: z.boolean(),
+  everSolved: z.boolean(),
 })
 
 function fitsPuzzle(board: Board, puzzle: Puzzle): boolean {

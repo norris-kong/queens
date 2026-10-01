@@ -76,13 +76,13 @@ describe('inspectDraft', () => {
     })
   })
 
-  it('reports Regions whose Cells touch only diagonally as not connected', () => {
-    // A and B each have two Cells meeting only at a corner.
+  it('reports Regions whose Cells touch only diagonally as not connected, and still counts Solutions', () => {
+    // A and B each have two Cells meeting only at a corner; no Queen placement satisfies this layout.
     const inspection = inspectDraft(grid('ABCC\nBACC\nDDDD\nDDDD'))
 
     expect(inspection).toEqual({
       valid: false,
-      problems: [{ kind: 'disconnectedRegions', regions: [0, 1] }],
+      problems: [{ kind: 'disconnectedRegions', regions: [0, 1] }, { kind: 'noSolution' }],
     })
   })
 

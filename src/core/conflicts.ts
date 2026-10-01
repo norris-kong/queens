@@ -7,7 +7,7 @@ export type ConflictKind = 'row' | 'column' | 'region' | 'adjacent'
 export interface Conflict {
   readonly kind: ConflictKind
   readonly queens: readonly Coord[]
-  readonly area: readonly Coord[]
+  readonly cells: readonly Coord[]
 }
 
 /** A set of Cells that may hold at most one Queen: a row, a column or a Region. */
@@ -42,7 +42,7 @@ function unitConflicts(puzzle: Puzzle, queens: readonly Coord[]): Conflict[] {
   const cells = allCells(puzzle)
   return unitsOf(puzzle).flatMap((unit) => {
     const inUnit = queens.filter(unit.contains)
-    return inUnit.length < 2 ? [] : [{ kind: unit.kind, queens: inUnit, area: cells.filter(unit.contains) }]
+    return inUnit.length < 2 ? [] : [{ kind: unit.kind, queens: inUnit, cells: cells.filter(unit.contains) }]
   })
 }
 
@@ -51,7 +51,7 @@ function adjacentConflicts(queens: readonly Coord[]): Conflict[] {
     queens
       .slice(index + 1)
       .filter((other) => touches(queen, other))
-      .map((other) => ({ kind: 'adjacent' as const, queens: [queen, other], area: [queen, other] })),
+      .map((other) => ({ kind: 'adjacent' as const, queens: [queen, other], cells: [queen, other] })),
   )
 }
 

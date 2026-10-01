@@ -1,18 +1,18 @@
-import { type DraftProblem, inspectDraft } from './draft.ts'
-import { type ParseError, parsePuzzle } from './puzzleFormat.ts'
+import type { DraftProblem } from './draft.ts'
+import { readPuzzle } from './puzzleFile.ts'
+import type { ParseError } from './puzzleFormat.ts'
 import { comparePuzzleNames, isValidPuzzleName } from './puzzleName.ts'
 import type { Puzzle } from './types.ts'
 
-/** A Puzzle file as stored in the library: `puzzles/<size>/<name>.txt`. */
-export interface PuzzleFile {
-  readonly size: number
-  readonly name: string
-  readonly text: string
-}
-
+/** Where a Puzzle file sits: its Size folder and Puzzle Name. */
 export interface FileRef {
   readonly size: number
   readonly name: string
+}
+
+/** A Puzzle file as stored in the library: `puzzles/<size>/<name>.txt`. */
+export interface PuzzleFile extends FileRef {
+  readonly text: string
 }
 
 export interface CatalogEntry {
@@ -39,19 +39,21 @@ export interface Catalog {
   readonly problems: readonly CatalogProblem[]
 }
 
-type Checked = { readonly ok: true; readonly puzzle: Puzzle } | { readonly ok: false; readonly problem: CatalogProblem }
+type FileCheck = { readonly ok: true; readonly puzzle: Puzzle } | { readonly ok: false; readonly problem: CatalogProblem }
 
-function checkFile(file: PuzzleFile): Checked {
+function checkFile(file: PuzzleFile): FileCheck {
   const ref = { size: file.size, name: file.name }
   if (!isValidPuzzleName(file.name)) return { ok: false, problem: { kind: 'invalidName', file: ref } }
-  const parsed = parsePuzzle(file.text)
-  if (!parsed.ok) return { ok: false, problem: { kind: 'unreadable', file: ref, error: parsed.error } }
-  const inspection = inspectDraft(parsed.grid)
-  if (!inspection.valid) return { ok: false, problem: { kind: 'notAPuzzle', file: ref, problems: inspection.problems } }
-  if (inspection.puzzle.size !== file.size) {
-    return { ok: false, problem: { kind: 'wrongSizeFolder', file: ref, actualSize: inspection.puzzle.size } }
+  const read = readPuzzle(file.text)
+  if (!read.ok) {
+    return read.reason === 'unreadable'
+      ? { ok: false, problem: { kind: 'unreadable', file: ref, error: read.error } }
+      : { ok: false, problem: { kind: 'notAPuzzle', file: ref, problems: read.problems } }
   }
-  return { ok: true, puzzle: inspection.puzzle }
+  if (read.puzzle.size !== file.size) {
+    return { ok: false, problem: { kind: 'wrongSizeFolder', file: ref, actualSize: read.puzzle.size } }
+  }
+  return { ok: true, puzzle: read.puzzle }
 }
 
 function byLibraryOrder(a: FileRef, b: FileRef): number {
