@@ -1,35 +1,63 @@
 import type { RegionGrid, Solution } from './types.ts'
 
-/** Cell indices (row * size + col) of every row, column and Region: each needs exactly one Queen. */
-function unitsOf(regions: RegionGrid): number[][] {
-  const size = regions.length
-  const indices = Array.from({ length: size }, (_, index) => index)
-  const rows = indices.map((row) => indices.map((col) => row * size + col))
-  const columns = indices.map((col) => indices.map((row) => row * size + col))
-  const byRegion = indices.map((region) =>
-    regions.flatMap((cells, row) => cells.flatMap((cellRegion, col) => (cellRegion === region ? [row * size + col] : []))),
-  )
-  return [...rows, ...columns, ...byRegion]
+/** Lookup tables for one Region layout, built once per search. Cells are numbered row * size + col. */
+interface Layout {
+  readonly size: number
+  /** Cells of every row, then every column, then every Region: each needs exactly one Queen. */
+  readonly units: readonly Int16Array[]
+  /** The three units (row, column, Region) each Cell belongs to. */
+  readonly unitsOfCell: readonly (readonly [number, number, number])[]
+  /** For each Cell, the Cells a Queen there rules out: its row, column, Region and touching Cells. */
+  readonly blocked: readonly Int16Array[]
 }
 
-/** For each Cell, the Cells a Queen there rules out: its row, column, Region and touching Cells. */
-function blockedBy(regions: RegionGrid): number[][] {
+function buildLayout(regions: RegionGrid): Layout {
   const size = regions.length
-  return Array.from({ length: size * size }, (_, cell) => {
-    const row = Math.floor(cell / size)
-    const col = cell % size
-    const region = regions[row]?.[col]
-    return Array.from({ length: size * size }, (_, other) => other).filter((other) => {
-      const otherRow = Math.floor(other / size)
-      const otherCol = other % size
-      return (
-        otherRow === row ||
-        otherCol === col ||
-        regions[otherRow]?.[otherCol] === region ||
-        (Math.abs(otherRow - row) <= 1 && Math.abs(otherCol - col) <= 1)
-      )
-    })
-  })
+  const cells = Array.from({ length: size * size }, (_, cell) => ({
+    cell,
+    row: Math.floor(cell / size),
+    col: cell % size,
+    region: regions[Math.floor(cell / size)]?.[cell % size] ?? -1,
+  }))
+  const indices = Array.from({ length: size }, (_, index) => index)
+  const units = [
+    ...indices.map((row) => Int16Array.from(cells.filter((c) => c.row === row).map((c) => c.cell))),
+    ...indices.map((col) => Int16Array.from(cells.filter((c) => c.col === col).map((c) => c.cell))),
+    ...indices.map((region) => Int16Array.from(cells.filter((c) => c.region === region).map((c) => c.cell))),
+  ]
+  const unitsOfCell = cells.map((c) => [c.row, size + c.col, 2 * size + c.region] as const)
+  const blocked = cells.map((c) =>
+    Int16Array.from(
+      cells
+        .filter(
+          (o) =>
+            o.row === c.row ||
+            o.col === c.col ||
+            o.region === c.region ||
+            (Math.abs(o.row - c.row) <= 1 && Math.abs(o.col - c.col) <= 1),
+        )
+        .map((o) => o.cell),
+    ),
+  )
+  return { size, units, unitsOfCell, blocked }
+}
+
+/** The unfilled unit with the fewest open Cells, or null once every unit holds a Queen. */
+function tightestUnit(layout: Layout, open: Uint8Array, filled: Uint8Array): Int16Array | null {
+  let best: Int16Array | null = null
+  let bestCount = Infinity
+  for (let unit = 0; unit < layout.units.length; unit++) {
+    if (filled[unit]) continue
+    const cells = layout.units[unit] as Int16Array
+    let count = 0
+    for (const cell of cells) count += open[cell] as number
+    if (count < bestCount) {
+      best = cells
+      bestCount = count
+      if (count === 0) break
+    }
+  }
+  return best
 }
 
 /**
@@ -37,31 +65,30 @@ function blockedBy(regions: RegionGrid): number[][] {
  * fewest open Cells, and a placed Queen closes every Cell it rules out, so dead ends show up early.
  */
 export function findSolutions(regions: RegionGrid, limit: number): Solution[] {
-  const size = regions.length
-  const units = unitsOf(regions)
-  const blocked = blockedBy(regions)
+  const layout = buildLayout(regions)
+  const { size } = layout
   const found: Solution[] = []
 
-  function search(open: readonly boolean[], queens: readonly number[]): void {
+  function search(open: Uint8Array, filled: Uint8Array, queens: readonly number[]): void {
     if (found.length >= limit) return
-    if (queens.length === size) {
+    const unit = tightestUnit(layout, open, filled)
+    if (unit === null) {
       const solution = Array<number>(size)
-      queens.forEach((cell) => (solution[Math.floor(cell / size)] = cell % size))
+      for (const cell of queens) solution[Math.floor(cell / size)] = cell % size
       found.push(solution)
       return
     }
-    const unfilled = units.filter((unit) => !unit.some((cell) => queens.includes(cell)))
-    const candidates = unfilled.map((unit) => unit.filter((cell) => open[cell]))
-    const tightest = candidates.reduce((best, cells) => (cells.length < best.length ? cells : best))
-    for (const cell of tightest) {
-      const closed = new Set(blocked[cell])
-      search(
-        open.map((isOpen, other) => isOpen && !closed.has(other)),
-        [...queens, cell],
-      )
+    for (const cell of unit) {
+      if (!open[cell]) continue
+      const nextOpen = open.slice()
+      for (const closed of layout.blocked[cell] as Int16Array) nextOpen[closed] = 0
+      const nextFilled = filled.slice()
+      for (const filledUnit of layout.unitsOfCell[cell] ?? []) nextFilled[filledUnit] = 1
+      search(nextOpen, nextFilled, [...queens, cell])
+      if (found.length >= limit) return
     }
   }
 
-  search(Array<boolean>(size * size).fill(true), [])
+  search(new Uint8Array(size * size).fill(1), new Uint8Array(layout.units.length), [])
   return found
 }
