@@ -27,10 +27,12 @@ export function useStroke(size: number, handlers: StrokeHandlers, disabled: bool
   const strokeRef = useRef<Coord[] | null>(null)
 
   function cellAtPoint(x: number, y: number): Coord | null {
-    const rect = boardRef.current?.getBoundingClientRect()
-    if (!rect || rect.width === 0) return null
-    const col = Math.floor(((x - rect.left) / rect.width) * size)
-    const row = Math.floor(((y - rect.top) / rect.height) * size)
+    const board = boardRef.current
+    if (!board || board.clientWidth === 0) return null
+    // Measure inside the board's border, where the Cells are.
+    const rect = board.getBoundingClientRect()
+    const col = Math.floor(((x - rect.left - board.clientLeft) / board.clientWidth) * size)
+    const row = Math.floor(((y - rect.top - board.clientTop) / board.clientHeight) * size)
     return row >= 0 && row < size && col >= 0 && col < size ? { row, col } : null
   }
 

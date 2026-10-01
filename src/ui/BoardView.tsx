@@ -26,14 +26,24 @@ const ARROW_STEPS: Readonly<Record<string, Coord>> = {
 
 const noop = () => undefined
 
-/** Region borders: thick between different Regions, thin inside one, none on the board's outer edge. */
-function borderClasses(regions: DraftGrid, { row, col }: Coord): string {
-  const region = regions[row]?.[col]
-  return [
-    row === 0 ? 'edge-top' : regions[row - 1]?.[col] !== region ? 'thick-top' : '',
-    col === 0 ? 'edge-left' : regions[row]?.[col - 1] !== region ? 'thick-left' : '',
-    region === null ? 'is-unassigned' : '',
-  ].join(' ')
+/** Thin Cell lines on every inner edge; the board's own border draws the outer edge. */
+function cellClasses(region: RegionId | null, { row, col }: Coord): string {
+  return [row === 0 ? 'edge-top' : '', col === 0 ? 'edge-left' : '', region === null ? 'is-unassigned' : ''].join(' ')
+}
+
+/**
+ * Thick lines wherever neighbouring Cells belong to different Regions, as one SVG path in Cell units.
+ * Drawn over the Cells with square line caps, so lines meeting at a corner always join without a gap.
+ */
+function regionBorderPath(regions: DraftGrid): string {
+  return regions
+    .flatMap((cells, row) =>
+      cells.flatMap((region, col) => [
+        ...(col > 0 && cells[col - 1] !== region ? [`M${col} ${row}V${row + 1}`] : []),
+        ...(row > 0 && regions[row - 1]?.[col] !== region ? [`M${col} ${row}H${col + 1}`] : []),
+      ]),
+    )
+    .join('')
 }
 
 /** Lets keyboard players move between Cells with the arrow keys and tap with Enter or Space. */
@@ -53,7 +63,6 @@ function handleKey(event: KeyboardEvent<HTMLDivElement>, cell: Coord, size: numb
 }
 
 interface BoardCellProps {
-  readonly regions: DraftGrid
   readonly cell: Coord
   readonly region: RegionId | null
   readonly view: CellView
@@ -61,7 +70,7 @@ interface BoardCellProps {
   readonly onKeyDown?: (event: KeyboardEvent<HTMLDivElement>) => void
 }
 
-function BoardCell({ regions, cell, region, view, focusable, onKeyDown }: BoardCellProps) {
+function BoardCell({ cell, region, view, focusable, onKeyDown }: BoardCellProps) {
   const color = region === null ? undefined : REGION_COLORS[region]
   return (
     <div
@@ -70,7 +79,7 @@ function BoardCell({ regions, cell, region, view, focusable, onKeyDown }: BoardC
       data-row={cell.row}
       data-col={cell.col}
       tabIndex={focusable ? 0 : -1}
-      className={`cell ${borderClasses(regions, cell)} ${view.className ?? ''}`}
+      className={`cell ${cellClasses(region, cell)} ${view.className ?? ''}`}
       style={color ? ({ '--region': color } as CSSProperties) : undefined}
       onKeyDown={onKeyDown}
     >
@@ -113,7 +122,6 @@ export function BoardView({
         cells.map((region, col) => (
           <BoardCell
             key={`${row}-${col}`}
-            regions={regions}
             cell={{ row, col }}
             region={region}
             view={renderCell({ row, col })}
@@ -122,6 +130,9 @@ export function BoardView({
           />
         )),
       )}
+      <svg className="region-lines" viewBox={`0 0 ${size} ${size}`} preserveAspectRatio="none" aria-hidden="true">
+        <path d={regionBorderPath(regions)} />
+      </svg>
     </div>
   )
 }

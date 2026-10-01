@@ -156,6 +156,7 @@ a {
   width: 100%;
   max-width: 560px;
   aspect-ratio: 1;
+  position: relative;
   margin: 0 auto;
   border: 3px solid var(--grid-line);
   border-radius: 6px;
@@ -185,12 +186,21 @@ a {
   border-left: none;
 }
 
-.cell.thick-top {
-  border-top: 3px solid var(--grid-line);
+.region-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  pointer-events: none;
 }
 
-.cell.thick-left {
-  border-left: 3px solid var(--grid-line);
+.region-lines path {
+  fill: none;
+  stroke: var(--grid-line);
+  stroke-width: 3px;
+  stroke-linecap: square;
+  vector-effect: non-scaling-stroke;
 }
 
 .cell:focus-visible {
