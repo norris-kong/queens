@@ -85,4 +85,16 @@ describe('inspectDraft', () => {
       problems: [{ kind: 'disconnectedRegions', regions: [0, 1] }],
     })
   })
+
+  it('quickly finds that a 12×12 Draft has no Solution when the clash is in the last row', () => {
+    // Rows 0–9 are Regions A–J; single-Cell Regions K and L share row 11, so no Solution exists.
+    const rows = [...'ABCDEFGHIJ'].map((letter) => letter.repeat(12))
+    const draft = grid([...rows, 'J'.repeat(12), `KL${'J'.repeat(10)}`].join('\n'))
+
+    const started = performance.now()
+    const inspection = inspectDraft(draft)
+
+    expect(inspection).toEqual({ valid: false, problems: [{ kind: 'noSolution' }] })
+    expect(performance.now() - started).toBeLessThan(200)
+  })
 })
