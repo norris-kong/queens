@@ -1,4 +1,5 @@
 import { type Board, type CellState, cellAt, emptyBoard, withCells } from './board'
+import { isSolved } from './conflicts'
 import type { Coord, Puzzle } from './types'
 
 /** A player's attempt at a Puzzle: the Board plus the earlier Boards that Undo can return to. */
@@ -18,9 +19,14 @@ function sameBoard(a: Board, b: Board): boolean {
   return a.every((cells, row) => cells.every((state, col) => b[row]?.[col] === state))
 }
 
-/** Records a new Board as one Move, unless it is no different from the current one. */
+/** Once Solved, the Board is locked: no further Move and no Undo. */
+export function isPlaySolved(play: Play): boolean {
+  return isSolved(play.puzzle, play.board)
+}
+
+/** Records a new Board as one Move, unless it is unchanged or the Play is already Solved. */
 function commit(play: Play, board: Board): Play {
-  if (sameBoard(play.board, board)) return play
+  if (isPlaySolved(play) || sameBoard(play.board, board)) return play
   return { ...play, board, history: [...play.history, play.board] }
 }
 
@@ -59,12 +65,12 @@ export function reset(play: Play): Play {
 }
 
 export function canUndo(play: Play): boolean {
-  return play.history.length > 0
+  return play.history.length > 0 && !isPlaySolved(play)
 }
 
 /** Returns to the Board before the latest Move. */
 export function undo(play: Play): Play {
   const previous = play.history.at(-1)
-  if (previous === undefined) return play
+  if (previous === undefined || isPlaySolved(play)) return play
   return { ...play, board: previous, history: play.history.slice(0, -1) }
 }

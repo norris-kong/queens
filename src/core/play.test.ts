@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { canUndo, drag, reset, startPlay, tap, undo } from './play'
+import { canUndo, drag, isPlaySolved, reset, startPlay, tap, undo } from './play'
 import { FOUR_BY_FOUR } from './testing'
 
 const at = (row: number, col: number) => ({ row, col })
@@ -63,5 +63,28 @@ describe('undo and reset', () => {
     const play = startPlay(FOUR_BY_FOUR)
 
     expect(undo(play)).toBe(play)
+  })
+})
+
+describe('a Solved Play', () => {
+  // Place the Solution of FOUR_BY_FOUR (columns 1-3-0-2) with two taps each.
+  const solution = [at(0, 1), at(1, 3), at(2, 0), at(3, 2)]
+  const solved = solution.reduce((play, coord) => tap(tap(play, coord), coord), startPlay(FOUR_BY_FOUR))
+
+  it('locks the Board against taps, drags, reset and undo', () => {
+    const attempts = [
+      tap(solved, at(0, 0)),
+      tap(solved, at(0, 1)),
+      drag(solved, [at(1, 1), at(2, 2)]),
+      reset(solved),
+      undo(solved),
+    ]
+
+    expect(attempts.every((play) => play === solved)).toBe(true)
+  })
+
+  it('reports itself as Solved and offers no Undo', () => {
+    expect(isPlaySolved(solved)).toBe(true)
+    expect(canUndo(solved)).toBe(false)
   })
 })
