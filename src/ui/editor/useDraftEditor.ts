@@ -12,6 +12,7 @@ import { editorApi } from './editorApi.ts'
 import type { EditorResult } from './editorProtocol.ts'
 import { editorStrings as text } from './editorStrings.ts'
 import { emptyDraft, hasAssignedCells, paint } from './draftPainting.ts'
+import { useAutoGenerate } from './useAutoGenerate.ts'
 
 /** Reload so the dev server re-reads the Puzzle files into the library. */
 function reloadAt(route: Route): void {
@@ -36,6 +37,7 @@ export function useDraftEditor(stored: Partial<FileRef>) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inspection = useMemo(() => inspectDraft(draft), [draft])
+  const auto = useAutoGenerate(size, draft, (regions) => setDraft(regions))
 
   async function run(request: () => Promise<EditorResult>, after: Route) {
     setBusy(true)
@@ -47,7 +49,11 @@ export function useDraftEditor(stored: Partial<FileRef>) {
   }
 
   return {
-    located, size, name, brush, busy, error, inspection,
+    located, size, name, brush, inspection,
+    busy: busy || auto.generating,
+    generating: auto.generating,
+    generate: auto.generate,
+    error: error ?? auto.generateError,
     shownDraft: stroke ? paint(draft, stroke, brush) : draft,
     nameValid: isValidPuzzleName(name),
     setName, setBrush, previewPaint: setStroke,

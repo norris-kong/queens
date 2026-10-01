@@ -16,7 +16,7 @@ export function DraftFields({ editor }: { readonly editor: DraftEditor }) {
           {text.size}
           <select
             value={editor.size}
-            disabled={editor.located !== null}
+            disabled={editor.located !== null || editor.busy}
             onChange={(event) => editor.changeSize(Number(event.target.value))}
           >
             {SIZES.map((option) => (
@@ -26,6 +26,9 @@ export function DraftFields({ editor }: { readonly editor: DraftEditor }) {
             ))}
           </select>
         </label>
+        <button type="button" className="button" disabled={editor.busy} onClick={editor.generate}>
+          {editor.generating ? text.generating : text.generate}
+        </button>
         <label className="field">
           {text.name}
           <input

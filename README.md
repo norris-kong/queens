@@ -23,7 +23,9 @@ Solution) and distinct; `pnpm test` fails otherwise.
 
 Make and edit Puzzles in the editor at `#/editor`, which only exists under `pnpm dev`. It checks the
 Draft as you paint, shows two diverging Solutions when there is more than one, and writes the file
-when you save. The `sample-*` Puzzles were generated as placeholders and can be replaced.
+when you save. **自動出題** fills the Draft with a generated Puzzle of the chosen Size (evenly sized
+Regions, exactly one Solution) that you can name, adjust and save. The `sample-*` Puzzles were
+generated as placeholders and can be replaced.
 
 ## Deploy
 

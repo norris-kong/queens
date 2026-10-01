@@ -5,6 +5,20 @@ export function coordKey({ row, col }: Coord): string {
   return `${row},${col}`
 }
 
+const ORTHOGONAL_STEPS: readonly Coord[] = [
+  { row: -1, col: 0 },
+  { row: 1, col: 0 },
+  { row: 0, col: -1 },
+  { row: 0, col: 1 },
+]
+
+/** The Cells directly above, below, left and right of `coord` that lie on a `size`×`size` board. */
+export function orthogonalNeighbours({ row, col }: Coord, size: number): Coord[] {
+  return ORTHOGONAL_STEPS.map((step) => ({ row: row + step.row, col: col + step.col })).filter(
+    (next) => next.row >= 0 && next.row < size && next.col >= 0 && next.col < size,
+  )
+}
+
 export function filledGrid<T>(size: number, value: T): T[][] {
   return Array.from({ length: size }, () => Array<T>(size).fill(value))
 }

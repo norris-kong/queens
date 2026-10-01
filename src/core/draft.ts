@@ -1,4 +1,4 @@
-import { coordKey } from './grid.ts'
+import { coordKey, orthogonalNeighbours } from './grid.ts'
 import { puzzleId } from './identity.ts'
 import { MAX_SIZE, MIN_SIZE } from './rules.ts'
 import { findSolutions } from './solver.ts'
@@ -19,13 +19,6 @@ export type DraftInspection =
 /** Enough Solutions to tell "none", "exactly one" and "more than one" apart. */
 const SOLUTIONS_TO_FIND = 2
 
-const ORTHOGONAL_STEPS: readonly Coord[] = [
-  { row: -1, col: 0 },
-  { row: 1, col: 0 },
-  { row: 0, col: -1 },
-  { row: 0, col: 1 },
-]
-
 function cellsOf(draft: DraftGrid): { readonly coord: Coord; readonly region: RegionId | null }[] {
   return draft.flatMap((cells, row) => cells.map((region, col) => ({ coord: { row, col }, region })))
 }
@@ -42,7 +35,7 @@ function findMissingRegions(draft: DraftGrid): RegionId[] {
 }
 
 /** True when every Cell of the Region can reach the others through up/down/left/right steps. */
-function isConnected(draft: DraftGrid, region: RegionId): boolean {
+export function isRegionConnected(draft: DraftGrid, region: RegionId): boolean {
   const members = cellsOf(draft).filter((cell) => cell.region === region)
   const [start] = members
   if (start === undefined) return true
@@ -51,8 +44,7 @@ function isConnected(draft: DraftGrid, region: RegionId): boolean {
   const frontier = [start.coord]
   while (frontier.length > 0) {
     const current = frontier.pop() as Coord
-    for (const step of ORTHOGONAL_STEPS) {
-      const next = { row: current.row + step.row, col: current.col + step.col }
+    for (const next of orthogonalNeighbours(current, draft.length)) {
       if (draft[next.row]?.[next.col] !== region || reached.has(coordKey(next))) continue
       reached.add(coordKey(next))
       frontier.push(next)
@@ -62,7 +54,7 @@ function isConnected(draft: DraftGrid, region: RegionId): boolean {
 }
 
 function findDisconnectedRegions(draft: DraftGrid): RegionId[] {
-  return Array.from({ length: draft.length }, (_, region) => region).filter((region) => !isConnected(draft, region))
+  return Array.from({ length: draft.length }, (_, region) => region).filter((region) => !isRegionConnected(draft, region))
 }
 
 /** Problems with how Cells are assigned to Regions. Only the first two keep Solutions from being counted. */
