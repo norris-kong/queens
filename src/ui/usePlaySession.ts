@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { isBoardEmpty } from '../core/board.ts'
 import { getHint, type Hint } from '../core/hint.ts'
 import { canUndo, drag, isPlaySolved, type Play, reset, startPlay, tap, undo } from '../core/play.ts'
+import type { PuzzleProgress } from '../core/progress.ts'
 import type { Coord, Puzzle } from '../core/types.ts'
 import { progressStore } from './progressStorage.ts'
 import { useSolveTimer } from './useSolveTimer.ts'
@@ -9,6 +10,22 @@ import { useSolveTimer } from './useSolveTimer.ts'
 export interface PlaySessionOptions {
   /** Keep progress between visits. Off for an editor play-test, which must leave no trace. */
   readonly persist: boolean
+}
+
+type Snapshot = Omit<PuzzleProgress, 'solveTimeMs'>
+
+/** Runs Solve Time while `running` and saves the snapshot with it after every change and every few seconds. */
+function useAutosave(puzzle: Puzzle, persist: boolean, saved: PuzzleProgress | null, running: boolean, snapshot: Snapshot) {
+  const latest = useRef<Snapshot>(snapshot)
+  const timer = useSolveTimer(saved?.solveTimeMs ?? 0, running, (solveTimeMs) => {
+    if (persist) progressStore.save(puzzle.id, { ...latest.current, solveTimeMs })
+  })
+  const { board, hintsUsed, everSolved } = snapshot
+  useEffect(() => {
+    latest.current = { board, hintsUsed, everSolved }
+    if (persist) progressStore.save(puzzle.id, { board, hintsUsed, everSolved, solveTimeMs: timer.read() })
+  }, [persist, puzzle.id, board, hintsUsed, everSolved, timer])
+  return timer
 }
 
 /**
@@ -25,14 +42,7 @@ export function usePlaySession(puzzle: Puzzle, { persist }: PlaySessionOptions) 
   const [solvedTimeMs, setSolvedTimeMs] = useState(() => (isPlaySolved(play) ? (saved?.solveTimeMs ?? 0) : null))
   const solved = isPlaySolved(play)
 
-  const latest = useRef({ board: play.board, hintsUsed, everSolved })
-  const timer = useSolveTimer(saved?.solveTimeMs ?? 0, !solved, (solveTimeMs) => {
-    if (persist) progressStore.save(puzzle.id, { ...latest.current, solveTimeMs })
-  })
-  useEffect(() => {
-    latest.current = { board: play.board, hintsUsed, everSolved }
-    if (persist) progressStore.save(puzzle.id, { ...latest.current, solveTimeMs: timer.read() })
-  }, [persist, puzzle.id, play, hintsUsed, everSolved, timer])
+  const timer = useAutosave(puzzle, persist, saved, !solved, { board: play.board, hintsUsed, everSolved })
 
   function applyMove(next: Play) {
     setStroke(null)
