@@ -27,12 +27,18 @@ describe('generatePuzzle', () => {
     GENERATION_TIMEOUT_MS,
   )
 
-  it.each(SIZES)('keeps every Region of a Size %i Puzzle within twice the average Region size', (size) => {
+  function regionSizes(size: number): number[] {
     const regions = puzzleOfSize(size)?.regions.flat() ?? []
-    const regionSizes = Array.from({ length: size }, (_, region) => regions.filter((r) => r === region).length)
+    return Array.from({ length: size }, (_, region) => regions.filter((r) => r === region).length)
+  }
 
+  it.each(SIZES)('keeps every Region of a Size %i Puzzle within twice the average Region size', (size) => {
     // N Regions share N×N Cells, so the average Region holds N Cells.
-    expect(Math.max(...regionSizes)).toBeLessThanOrEqual(2 * size)
+    expect(Math.max(...regionSizes(size))).toBeLessThanOrEqual(2 * size)
+  })
+
+  it.each(SIZES)('never gives a Size %i Puzzle a single-Cell Region, which would give its Queen away', (size) => {
+    expect(Math.min(...regionSizes(size))).toBeGreaterThanOrEqual(2)
   })
 
   it('makes the same Puzzle from the same seed, and a different one from another seed', () => {

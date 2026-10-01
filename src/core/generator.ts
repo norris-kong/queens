@@ -12,6 +12,8 @@ const REPAIR_STEPS_PER_SIZE = 6
 const SOLUTIONS_PER_LOOK = 16
 /** No Region may grow past this many times the average Region size (which equals the Size). */
 const MAX_REGION_SIZE_FACTOR = 2
+/** A single-Cell Region gives its Queen away at once, so every Region keeps at least this many Cells. */
+const MIN_REGION_SIZE = 2
 
 const range = (count: number) => Array.from({ length: count }, (_, index) => index)
 
@@ -75,9 +77,10 @@ function breakSolutions(
   const size = regions.length
   for (const cell of cellsToMove(target, others, random)) {
     const from = regions[cell.row]?.[cell.col]
+    if (from === undefined || cellsOf(regions, from).length <= MIN_REGION_SIZE) continue
     for (const neighbour of shuffled(orthogonalNeighbours(cell, size), random)) {
       const to = regions[neighbour.row]?.[neighbour.col]
-      if (from === undefined || to === undefined || to === from) continue
+      if (to === undefined || to === from) continue
       const moved = replaceCells(regions, [{ coord: cell, value: to }])
       if (isRegionConnected(moved, from)) return moved
     }
@@ -100,9 +103,12 @@ function removeOtherSolutions(regions: RegionGrid, target: Solution, random: Ran
   return null
 }
 
-function isBalanced(regions: RegionGrid): boolean {
+function hasFairRegionSizes(regions: RegionGrid): boolean {
   const size = regions.length
-  return range(size).every((region) => cellsOf(regions, region).length <= size * MAX_REGION_SIZE_FACTOR)
+  return range(size).every((region) => {
+    const cells = cellsOf(regions, region).length
+    return cells >= MIN_REGION_SIZE && cells <= size * MAX_REGION_SIZE_FACTOR
+  })
 }
 
 /** Re-letters Regions in reading order, so the top-left Region is always A. */
@@ -113,13 +119,14 @@ function inReadingOrder(regions: RegionGrid): RegionGrid {
 
 /**
  * Makes a new Puzzle of the given Size: picks a Solution, grows evenly sized Regions around its
- * Queens, then reshapes them until no other Solution remains. Null if every attempt fails.
+ * Queens, then reshapes them until no other Solution remains. Every Region ends up with between
+ * 2 Cells and twice the average. Null if every attempt fails.
  */
 export function generatePuzzle(size: number, random: Random): Puzzle | null {
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
     const solution = randomSolution(size, random)
     const regions = removeOtherSolutions(growRegions(size, solution, random), solution, random)
-    if (!regions || !isBalanced(regions)) continue
+    if (!regions || !hasFairRegionSizes(regions)) continue
     const inspection = inspectDraft(inReadingOrder(regions))
     if (inspection.valid) return inspection.puzzle
   }
