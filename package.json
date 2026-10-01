@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "e2e:watch": "E2E_SLOW_MO=400 playwright test --headed --workers=1 --project=desktop"
   },
   "dependencies": {
     "react": "^19.3.0",

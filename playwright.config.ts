@@ -12,6 +12,8 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
+    // E2E_SLOW_MO=400 slows every action down by 400 ms, for watching a headed run.
+    launchOptions: { slowMo: Number(process.env.E2E_SLOW_MO ?? 0) },
   },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
