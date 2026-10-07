@@ -105,6 +105,16 @@ a {
   color: var(--text-muted);
 }
 
+/* Read by screen readers, not shown. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .button {
   display: inline-flex;
   align-items: center;
@@ -325,7 +335,7 @@ a {
 
 .puzzle-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
   gap: 8px;
   margin: 0;
   padding: 0;
@@ -335,10 +345,10 @@ a {
 .puzzle-link {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  justify-content: center;
+  gap: 6px;
   min-height: 48px;
-  padding: 8px 12px;
+  padding: 8px;
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--surface);

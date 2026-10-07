@@ -1,4 +1,3 @@
-import { SHOW_PUZZLE_NAMES } from '../config.ts'
 import type { Catalog, CatalogEntry } from '../core/catalog.ts'
 
 export interface LocatedEntry {
@@ -20,9 +19,4 @@ export function nextEntry(catalog: Catalog, size: number, name: string): Located
   const entries = allEntries(catalog)
   const index = entries.findIndex((located) => located.size === size && located.entry.name === name)
   return index === -1 ? null : (entries[index + 1] ?? null)
-}
-
-/** The Puzzle Name to show players, or null when names are hidden. */
-export function shownName(entry: CatalogEntry): string | null {
-  return SHOW_PUZZLE_NAMES ? entry.name : null
 }

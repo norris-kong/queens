@@ -1,6 +1,6 @@
 import { library } from '../puzzleLibrary.ts'
 import { strings } from '../strings.ts'
-import { findEntry, nextEntry, shownName } from './libraryLookup.ts'
+import { findEntry, nextEntry } from './libraryLookup.ts'
 import { PlayScreen } from './PlayScreen.tsx'
 import { routeHash } from './routes.ts'
 import { navigate } from './useHashRoute.ts'
@@ -20,7 +20,7 @@ export function PlayPage({ size, name }: PlayPageProps) {
         <a className="back-link" href={routeHash({ page: 'home' })}>
           {strings.backToList}
         </a>
-        {located && <h1>{strings.puzzleTitle(size, located.entry.number, shownName(located.entry))}</h1>}
+        {located && <h1>{strings.puzzleTitle(size, located.entry.number)}</h1>}
       </header>
       {located ? (
         <PlayScreen

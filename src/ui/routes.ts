@@ -5,18 +5,26 @@ export type Route =
   | { readonly page: 'editor'; readonly size?: number; readonly name?: string }
   | { readonly page: 'notFound' }
 
-const PUZZLE_PATH = /^\/(play|editor)\/(\d+)\/([a-z0-9_-]+)$/
+const PUZZLE_PATH = /^\/(play|editor)\/(\d+)\/([^/]+)$/
 
-/** Reads the page from the URL hash, e.g. "#/play/8/spiral". Hash routes work on any static host. */
+function decodeName(escaped: string): string | null {
+  try {
+    return decodeURIComponent(escaped)
+  } catch {
+    return null
+  }
+}
+
+/** Reads the page from the URL hash, e.g. "#/play/4/Beginner%201". Hash routes work on any static host. */
 export function parseRoute(hash: string): Route {
   const path = hash.replace(/^#/, '') || '/'
   if (path === '/') return { page: 'home' }
   if (path === '/rules') return { page: 'rules' }
   if (path === '/editor') return { page: 'editor' }
   const match = PUZZLE_PATH.exec(path)
-  if (!match) return { page: 'notFound' }
-  const [, page, size, name] = match
-  return { page: page as 'play' | 'editor', size: Number(size), name: name ?? '' }
+  const name = decodeName(match?.[3] ?? '')
+  if (!match || !name) return { page: 'notFound' }
+  return { page: match[1] as 'play' | 'editor', size: Number(match[2]), name }
 }
 
 export function routeHash(route: Route): string {
@@ -27,10 +35,10 @@ export function routeHash(route: Route): string {
     case 'rules':
       return '#/rules'
     case 'play':
-      return `#/play/${route.size}/${route.name}`
+      return `#/play/${route.size}/${encodeURIComponent(route.name)}`
     case 'editor':
       return route.size === undefined || route.name === undefined
         ? '#/editor'
-        : `#/editor/${route.size}/${route.name}`
+        : `#/editor/${route.size}/${encodeURIComponent(route.name)}`
   }
 }

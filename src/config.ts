@@ -1,6 +1,3 @@
-/** Show each Puzzle Name next to its number ("8×8 #3 spiral"). Set to false to show "8×8 #3" only. */
-export const SHOW_PUZZLE_NAMES = true
-
 /** Region colours by Region letter, A first. Regions are also split by thick borders, never by colour alone. */
 export const REGION_COLORS: readonly string[] = [
   '#c7a6ec', // A purple

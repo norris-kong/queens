@@ -42,12 +42,12 @@ describe('buildCatalog', () => {
       { size: 4, name: 'two-answers', text: 'AAAA\nBBBB\nCCCC\nDDDD\n' },
       { size: 4, name: 'garbled', text: 'AB\nBAA\n' },
       { size: 5, name: 'misfiled', text: FOUR },
-      { size: 4, name: 'Bad Name', text: FOUR },
+      { size: 4, name: 'bad.name', text: FOUR },
     ])
 
     expect(catalog.sizes).toEqual([])
     expect(catalog.problems.map((problem) => [problem.kind, problem.file.name])).toEqual([
-      ['invalidName', 'Bad Name'],
+      ['invalidName', 'bad.name'],
       ['unreadable', 'garbled'],
       ['notAPuzzle', 'two-answers'],
       ['wrongSizeFolder', 'misfiled'],

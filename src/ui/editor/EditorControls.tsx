@@ -2,7 +2,6 @@ import type { CSSProperties } from 'react'
 import { REGION_COLORS } from '../../config.ts'
 import { regionLetter } from '../../core/puzzleFormat.ts'
 import { MAX_SIZE, MIN_SIZE } from '../../core/rules.ts'
-import { strings } from '../../strings.ts'
 import { editorStrings as text } from './editorStrings.ts'
 import type { DraftEditor } from './useDraftEditor.ts'
 
@@ -21,7 +20,7 @@ export function DraftFields({ editor }: { readonly editor: DraftEditor }) {
           >
             {SIZES.map((option) => (
               <option key={option} value={option}>
-                {strings.sizeHeading(option)}
+                {text.sizeOption(option)}
               </option>
             ))}
           </select>
@@ -37,7 +36,7 @@ export function DraftFields({ editor }: { readonly editor: DraftEditor }) {
             autoCapitalize="off"
             spellCheck={false}
             aria-invalid={editor.name !== '' && !editor.nameValid}
-            onChange={(event) => editor.setName(event.target.value.trim())}
+            onChange={(event) => editor.setName(event.target.value)}
           />
         </label>
       </div>

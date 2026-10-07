@@ -2,6 +2,20 @@ import { expect, test } from '@playwright/test'
 
 // These flows never press 儲存, so they leave the puzzles/ folder untouched.
 
+test('a new Puzzle is named after its Level and the next free number', async ({ page }) => {
+  await page.goto('#/editor')
+  const name = page.getByLabel('題目名稱')
+
+  await page.getByLabel('尺寸').selectOption('4')
+  await expect(name).toHaveValue(/^Beginner \d+$/)
+
+  await page.getByLabel('尺寸').selectOption('5')
+  await expect(name).toHaveValue(/^Easy \d+$/)
+
+  await name.fill('My Puzzle 2')
+  await expect(page.getByText('題目名稱只能用', { exact: false })).toBeHidden()
+})
+
 test('the author generates a valid Puzzle with one click', async ({ page }) => {
   await page.goto('#/editor')
   await page.getByLabel('尺寸').selectOption('7')

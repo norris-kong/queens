@@ -1,4 +1,5 @@
 import type { HintKind } from './core/hint.ts'
+import { levelName } from './core/level.ts'
 
 /** Every piece of interface text, in one place so another language can be added later. */
 export const strings = {
@@ -8,11 +9,13 @@ export const strings = {
   editorLink: '題目編輯器',
   backToList: '‹ 題目列表',
   sizeHeading: (size: number) => `${size} × ${size}`,
-  puzzleLabel: (number: number, name: string | null) => (name === null ? `#${number}` : `#${number} ${name}`),
-  puzzleTitle: (size: number, number: number, name: string | null) =>
-    `${size}×${size} #${number}${name === null ? '' : ` ${name}`}`,
-  statusSolved: '✓ 已通關',
-  statusInProgress: '● 進行中',
+  levelHeading: levelName,
+  puzzleLabel: (number: number, name: string) => `#${number} ${name}`,
+  puzzleTitle: (size: number, number: number) => `${levelName(size)} ${number}`,
+  status: {
+    solved: { icon: '✓', label: '已通關' },
+    inProgress: { icon: '●', label: '進行中' },
+  },
   emptyLibrary: '題庫裡還沒有題目。',
   puzzleNotFound: '找不到這個題目，可能已被刪除或改名。',
   pageNotFound: '找不到這個頁面。',

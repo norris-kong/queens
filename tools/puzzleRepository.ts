@@ -1,11 +1,11 @@
-import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import type { FileRef, PuzzleFile } from '../src/core/catalog.ts'
 import type { DraftProblem } from '../src/core/draft.ts'
 import { puzzleId } from '../src/core/identity.ts'
 import { PUZZLE_EXTENSION, readPuzzle, SIZE_FOLDER, sizeFolder } from '../src/core/puzzleFile.ts'
 import { formatPuzzle, type ParseError, parsePuzzle } from '../src/core/puzzleFormat.ts'
-import { isValidPuzzleName } from '../src/core/puzzleName.ts'
+import { isValidPuzzleName, samePuzzleName } from '../src/core/puzzleName.ts'
 import { MAX_SIZE, MIN_SIZE } from '../src/core/rules.ts'
 import type { Puzzle, RegionGrid } from '../src/core/types.ts'
 
@@ -91,7 +91,7 @@ function findClash(request: SaveRequest, puzzle: Puzzle, sameSize: readonly Puzz
   const { previousName } = request
   if (previousName !== undefined && !sameSize.some((file) => file.name === previousName)) return { kind: 'notFound' }
   const others = sameSize.filter((file) => file.name !== previousName)
-  if (others.some((file) => file.name === request.name)) return { kind: 'nameTaken' }
+  if (others.some((file) => samePuzzleName(file.name, request.name))) return { kind: 'nameTaken' }
   const original = others.find((file) => storedId(file) === puzzle.id)
   return original ? { kind: 'duplicate', sameAs: { size: original.size, name: original.name } } : null
 }
@@ -104,11 +104,12 @@ async function savePuzzle(root: string, request: SaveRequest): Promise<Repositor
   if (clash) return failure(clash)
 
   await mkdir(join(root, sizeFolder(request.size)), { recursive: true })
-  await writeFile(fileOf(root, request), formatPuzzle(checked.puzzle.regions))
   const { previousName } = request
   if (previousName !== undefined && previousName !== request.name) {
-    await rm(fileOf(root, { size: request.size, name: previousName }))
+    // Move before writing: on a disk that ignores case, "corner" and "Corner" are the same file.
+    await rename(fileOf(root, { size: request.size, name: previousName }), fileOf(root, request))
   }
+  await writeFile(fileOf(root, request), formatPuzzle(checked.puzzle.regions))
   return OK
 }
 

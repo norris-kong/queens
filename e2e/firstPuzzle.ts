@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'node:url'
 import { buildCatalog } from '../src/core/catalog.ts'
 import type { Coord, Puzzle } from '../src/core/types.ts'
+import { routeHash } from '../src/ui/routes.ts'
 import { createPuzzleRepository } from '../tools/puzzleRepository.ts'
 
 export interface FirstPuzzle {
@@ -20,7 +21,7 @@ export async function firstPuzzle(): Promise<FirstPuzzle> {
   const solution = entry.puzzle.solution.map((col, row) => ({ row, col }))
   const firstCol = entry.puzzle.solution[0] ?? 0
   return {
-    path: `#/play/${group.size}/${entry.name}`,
+    path: routeHash({ page: 'play', size: group.size, name: entry.name }),
     puzzle: entry.puzzle,
     solution,
     wrongCell: { row: 0, col: firstCol === 0 ? 1 : 0 },

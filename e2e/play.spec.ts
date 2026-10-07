@@ -20,6 +20,17 @@ async function dragAcross(page: Page, from: Coord, to: Coord) {
   await page.mouse.up()
 }
 
+test('the list groups Puzzles under their Level and shows only their number', async ({ page }) => {
+  await page.goto('./')
+  const first = page.locator(`a[href="${target.path}"]`)
+
+  await expect(page.getByRole('heading', { name: 'Beginner', exact: true })).toBeVisible()
+  await expect(first).toHaveText('1')
+
+  await first.click()
+  await expect(page.getByRole('heading', { name: 'Beginner 1', exact: true })).toBeVisible()
+})
+
 test('a player solves a Puzzle and sees it ticked in the list', async ({ page }) => {
   await page.goto('./')
   await page.locator(`a[href="${target.path}"]`).click()

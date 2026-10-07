@@ -1,4 +1,5 @@
 import type { CatalogProblem } from '../../core/catalog.ts'
+import { levelName } from '../../core/level.ts'
 import { MAX_SIZE, MIN_SIZE } from '../../core/rules.ts'
 import type { EditorErrorKind } from './editorProtocol.ts'
 
@@ -20,9 +21,10 @@ export const editorStrings = {
     }`,
   notFound: '找不到這個題目，已改為新增題目。',
   size: '尺寸',
+  sizeOption: (size: number) => `${size} × ${size} · ${levelName(size)}`,
   name: '題目名稱',
-  namePlaceholder: '例如 spiral-hard',
-  nameRule: '題目名稱只能用小寫英文、數字、- 和 _。',
+  namePlaceholder: '例如 Beginner 1',
+  nameRule: '題目名稱只能用英文字母、數字、空格、- 和 _，最多 40 字；空格只能夾在字中間，不能連續。',
   eraser: '⌫',
   regionSwatch: (letter: string) => `區域 ${letter}`,
   eraserLabel: '橡皮擦：把格子改回未分配',

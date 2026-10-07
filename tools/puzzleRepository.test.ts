@@ -34,6 +34,13 @@ describe('puzzle repository', () => {
     expect(await repository.list()).toEqual([{ size: 4, name: 'corner', text: FOUR }])
   })
 
+  it('saves a Puzzle Name with capitals and spaces', async () => {
+    const result = await repository.save({ size: 4, name: 'Beginner 1', text: FOUR })
+
+    expect(result).toEqual({ ok: true })
+    expect(await repository.list()).toEqual([{ size: 4, name: 'Beginner 1', text: FOUR }])
+  })
+
   it.each([
     ['an invalid Puzzle Name', { size: 4, name: '../escape', text: FOUR }, { kind: 'invalidName' }],
     ['an unsupported Size', { size: 99, name: 'huge', text: FOUR }, { kind: 'invalidSize' }],
@@ -53,6 +60,15 @@ describe('puzzle repository', () => {
     const result = await repository.save({ size: 4, name: 'corner', text: OTHER_FOUR })
 
     expect(result).toEqual({ ok: false, error: { kind: 'nameTaken' } })
+  })
+
+  it('refuses a new name that differs from a used one only in case, as the files would clash', async () => {
+    await repository.save({ size: 4, name: 'Beginner 1', text: FOUR })
+
+    const result = await repository.save({ size: 4, name: 'beginner 1', text: OTHER_FOUR })
+
+    expect(result).toEqual({ ok: false, error: { kind: 'nameTaken' } })
+    expect(await repository.list()).toEqual([{ size: 4, name: 'Beginner 1', text: FOUR }])
   })
 
   it('refuses a layout already in the library, even re-lettered', async () => {
@@ -88,6 +104,13 @@ describe('editing stored Puzzles', () => {
 
     expect(result).toEqual({ ok: true })
     expect(await repository.list()).toEqual([{ size: 4, name: 'renamed', text: FOUR }])
+  })
+
+  it('renames a Puzzle by changing only the case of its name', async () => {
+    const result = await repository.save({ size: 4, name: 'Corner', previousName: 'corner', text: OTHER_FOUR })
+
+    expect(result).toEqual({ ok: true })
+    expect(await repository.list()).toEqual([{ size: 4, name: 'Corner', text: OTHER_FOUR }])
   })
 
   it('refuses to rename onto a name used by another Puzzle', async () => {

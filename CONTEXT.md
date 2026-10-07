@@ -9,7 +9,7 @@
 _Avoid_: Map, layout, stage
 
 **Puzzle Name**（題目名稱）:
-作者替 Puzzle 取的名字，同一個 Size 內不可重複；決定題目在清單上的顯示順序，但不影響 Puzzle 的身份。
+作者替 Puzzle 取的名字，同一個 Size 內不可重複（不分大小寫）；新題目預設為所屬 Level 加流水號，例如 Beginner 1。決定題目在清單上的顯示順序，但不影響 Puzzle 的身份。玩家看不到 Puzzle Name，只看到 Level 和編號。
 _Avoid_: Filename, title, ID
 
 **Draft**（草稿）:
@@ -17,8 +17,12 @@ _Avoid_: Filename, title, ID
 _Avoid_: Unfinished puzzle, template
 
 **Size**（尺寸）:
-Puzzle 的邊長 N（4 到 12），同時也是 Region 數與 Solution 中的 Queen 數。
-_Avoid_: Dimension, level
+Puzzle 的邊長 N（4 到 12），同時也是 Region 數與 Solution 中的 Queen 數。玩家看到的是它的 Level。
+_Avoid_: Dimension
+
+**Level**（關卡）:
+Size 在玩家面前的名稱，與 Size 一一對應：4 Beginner、5 Easy、6 Relaxed、7 Normal、8 Intermediate、9 Challenging、10 Hard、11 Expert、12 Master。題目列表以 Level 分組，每個 Puzzle 只以編號呈現。
+_Avoid_: Difficulty, tier, stage（Level 只由 Size 決定，不是替個別 Puzzle 評的難度）
 
 **Solution**（解答）:
 一組 N 個 Queen 的擺放位置，使每一列、每一行、每個 Region 都恰好有一個 Queen，且任兩個 Queen 不相鄰（含斜角）。由 Puzzle 的 Region 劃分推導而來，不是另外指定的。
