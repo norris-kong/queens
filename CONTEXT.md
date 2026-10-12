@@ -12,6 +12,14 @@ _Avoid_: Map, layout, stage
 作者替 Puzzle 取的名字，同一個 Size 內不可重複（不分大小寫）；新題目預設為所屬 Level 加流水號，例如 Beginner 1。決定題目在清單上的顯示順序，但不影響 Puzzle 的身份。玩家看不到 Puzzle Name，只看到 Level 和編號。
 _Avoid_: Filename, title, ID
 
+**LinkedIn Puzzle**（LinkedIn 題目）:
+出自 LinkedIn Queens 每日題目的 Puzzle，以 LinkedIn 原本的編號稱呼（例如 LinkedIn #250），與作者自己出的 Puzzle 分開陳列，並標註出處。
+_Avoid_: Imported puzzle, archive puzzle
+
+**Daily Puzzle**（每日題目）:
+每天一題、完全由當天日期決定的 Puzzle：同一天的所有玩家拿到同一題，以香港時間（UTC+8）午夜換題。Size 依星期遞增，星期一 6 到星期日 12。不存放在題庫裡。
+_Avoid_: Today's puzzle, daily challenge
+
 **Draft**（草稿）:
 編輯中的 Region 劃分，還不保證符合 Puzzle 的條件（N×N、每個 Cell 都已分配、N 個相連的 Region、恰好一個 Solution）。全部符合後才能成為 Puzzle。
 _Avoid_: Unfinished puzzle, template
@@ -20,9 +28,17 @@ _Avoid_: Unfinished puzzle, template
 Puzzle 的邊長 N（4 到 12），同時也是 Region 數與 Solution 中的 Queen 數。玩家看到的是它的 Level。
 _Avoid_: Dimension
 
-**Level**（關卡）:
+**Level**（等級）:
 Size 在玩家面前的名稱，與 Size 一一對應：4 Beginner、5 Easy、6 Relaxed、7 Normal、8 Intermediate、9 Challenging、10 Hard、11 Expert、12 Master。題目列表以 Level 分組，每個 Puzzle 只以編號呈現。
-_Avoid_: Difficulty, tier, stage（Level 只由 Size 決定，不是替個別 Puzzle 評的難度）
+_Avoid_: Difficulty, tier, stage, 關卡（Level 只由 Size 決定，不是替個別 Puzzle 評的難度）
+
+**Nightmare**（無限挑戰）:
+接在 Master 之後、沒有終點的一連串 Stage：每通關一個 Stage 就產生下一個。從 Size 6 開始，每 5 個 Stage 大一級，第 31 關起固定為 Size 12。Nightmare 不是 Level。
+_Avoid_: Endless mode, 第 10 個 Level
+
+**Stage**（關）:
+Nightmare 裡的一個 Puzzle，以「第 N 關」稱呼；所有玩家的第 N 關都是同一題。玩家只能往前，通過的 Stage 不能回頭重玩。
+_Avoid_: Level, round, 關卡
 
 **Solution**（解答）:
 一組 N 個 Queen 的擺放位置，使每一列、每一行、每個 Region 都恰好有一個 Queen，且任兩個 Queen 不相鄰（含斜角）。由 Puzzle 的 Region 劃分推導而來，不是另外指定的。
