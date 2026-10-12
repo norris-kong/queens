@@ -53,7 +53,7 @@ _Avoid_: Square, tile
 _Avoid_: Color region, area, zone, 色塊
 
 **Queen**（皇后）:
-玩家放在 Cell 上的棋子，畫面上以皇冠圖示呈現。
+玩家放在 Cell 上的棋子，畫面上以盤面 Size 所屬 Level 的圖示呈現（例如 Beginner 是橡實、Easy 是小鳥）。
 _Avoid_: W, crown, 皇冠
 
 **Mark**（標記）:

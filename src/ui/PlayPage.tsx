@@ -19,8 +19,8 @@ export function PlayPage({ size, name }: PlayPageProps) {
   return (
     <main className="page">
       <header className="page-header">
-        <a className="back-link" href={routeHash({ page: 'home' })}>
-          {strings.backToList}
+        <a className="back-link" href={routeHash({ page: 'level', size })}>
+          {strings.backToLevel(size)}
         </a>
         {located && <h1>{strings.puzzleTitle(size, located.entry.number)}</h1>}
       </header>

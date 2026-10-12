@@ -1,6 +1,7 @@
 export type Route =
   | { readonly page: 'home' }
   | { readonly page: 'rules' }
+  | { readonly page: 'level'; readonly size: number }
   | { readonly page: 'play'; readonly size: number; readonly name: string }
   | { readonly page: 'editor'; readonly size?: number; readonly name?: string }
   | { readonly page: 'linkedIn' }
@@ -11,6 +12,7 @@ export type Route =
   | { readonly page: 'notFound' }
 
 const PUZZLE_PATH = /^\/(play|editor)\/(\d+)\/([^/]+)$/
+const LEVEL_PATH = /^\/level\/(\d+)$/
 const LINKEDIN_PATH = /^\/linkedin\/([1-9]\d*)$/
 const DAILY_PATH = /^\/daily\/(\d{4}-\d{2}-\d{2})$/
 
@@ -28,6 +30,8 @@ export function parseRoute(hash: string): Route {
   if (path === '/') return { page: 'home' }
   if (path === '/rules') return { page: 'rules' }
   if (path === '/editor') return { page: 'editor' }
+  const level = LEVEL_PATH.exec(path)
+  if (level) return { page: 'level', size: Number(level[1]) }
   if (path === '/linkedin') return { page: 'linkedIn' }
   const linkedIn = LINKEDIN_PATH.exec(path)
   if (linkedIn) return { page: 'linkedInPlay', number: Number(linkedIn[1]) }
@@ -48,6 +52,8 @@ export function routeHash(route: Route): string {
       return '#/'
     case 'rules':
       return '#/rules'
+    case 'level':
+      return `#/level/${route.size}`
     case 'play':
       return `#/play/${route.size}/${encodeURIComponent(route.name)}`
     case 'editor':

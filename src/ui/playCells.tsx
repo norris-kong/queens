@@ -2,10 +2,14 @@ import type { Board, CellState } from '../core/board.ts'
 import { findConflicts } from '../core/conflicts.ts'
 import { coordKey as key } from '../core/grid.ts'
 import type { Hint } from '../core/hint.ts'
+import type { CSSProperties } from 'react'
 import type { Coord, Puzzle } from '../core/types.ts'
 import { strings } from '../strings.ts'
 import type { CellView } from './BoardView.tsx'
-import { MarkIcon, QueenIcon } from './icons.tsx'
+import { MarkIcon, QueenMark } from './icons.tsx'
+
+/** On a Solve, the Queens grow and settle back one row after another, this far apart. */
+const CELEBRATION_STAGGER_MS = 70
 
 export interface Highlights {
   readonly striped: ReadonlySet<string>
@@ -20,8 +24,11 @@ export function highlightsFor(puzzle: Puzzle, board: Board): Highlights {
   }
 }
 
-function cellContent(state: CellState | undefined, queenClass: string) {
-  if (state === 'queen') return <QueenIcon className={queenClass} />
+function cellContent(state: CellState | undefined, queenClass: string, size: number, row: number) {
+  if (state === 'queen') {
+    const delay = { '--celebration-delay': `${row * CELEBRATION_STAGGER_MS}ms` } as CSSProperties
+    return <QueenMark size={size} className={queenClass} style={delay} />
+  }
   if (state === 'mark') return <MarkIcon />
   return null
 }
@@ -33,7 +40,7 @@ export function cellView(board: Board, highlights: Highlights, hint: Hint | null
   const hinted = hint !== null && key(hint.cell) === id
   return {
     label: strings.cellLabel(cell.row, cell.col, strings.cellStates[state ?? 'empty']),
-    content: cellContent(state, queenClass),
+    content: cellContent(state, queenClass, board.length, cell.row),
     className: [highlights.striped.has(id) ? 'is-striped' : '', hinted ? 'is-hinted' : ''].join(' '),
   }
 }

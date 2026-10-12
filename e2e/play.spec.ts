@@ -20,8 +20,9 @@ async function dragAcross(page: Page, from: Coord, to: Coord) {
   await page.mouse.up()
 }
 
-test('the list groups Puzzles under their Level and shows only their number', async ({ page }) => {
+test("each Level's picture button opens its Puzzles, shown by number only", async ({ page }) => {
   await page.goto('./')
+  await page.getByRole('link', { name: 'Beginner', exact: true }).click()
   const first = page.locator(`a[href="${target.path}"]`)
 
   await expect(page.getByRole('heading', { name: 'Beginner', exact: true })).toBeVisible()
@@ -31,8 +32,8 @@ test('the list groups Puzzles under their Level and shows only their number', as
   await expect(page.getByRole('heading', { name: 'Beginner 1', exact: true })).toBeVisible()
 })
 
-test('a player solves a Puzzle and sees it ticked in the list', async ({ page }) => {
-  await page.goto('./')
+test('a player solves a Puzzle, sees its Queens celebrate, and finds it ticked in its Level', async ({ page }) => {
+  await page.goto(target.levelPath)
   await page.locator(`a[href="${target.path}"]`).click()
 
   // Asking twice before the next Move counts as one Hint.
@@ -45,8 +46,9 @@ test('a player solves a Puzzle and sees it ticked in the list', async ({ page })
 
   await expect(page.getByRole('heading', { name: '通關！' })).toBeVisible()
   await expect(page.getByText(/解題時間 \d+:\d\d · 使用提示 1 次/)).toBeVisible()
+  await expect(page.locator('img.queen.is-solved')).toHaveCount(target.puzzle.size)
 
-  await page.getByRole('link', { name: '‹ 題目列表' }).click()
+  await page.getByRole('link', { name: '‹ Beginner' }).click()
   await expect(page.locator(`a[href="${target.path}"]`)).toContainText('已通關')
 })
 
@@ -54,7 +56,7 @@ test('opening a Puzzle without playing it does not mark it in progress', async (
   await page.goto(target.path)
   await expect(cell(page, { row: 0, col: 0 })).toBeVisible()
 
-  await page.getByRole('link', { name: '‹ 題目列表' }).click()
+  await page.getByRole('link', { name: '‹ Beginner' }).click()
 
   await expect(page.locator(`a[href="${target.path}"]`)).not.toContainText('進行中')
 })

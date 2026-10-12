@@ -6,6 +6,7 @@ describe('hash routes', () => {
     { page: 'home' },
     { page: 'rules' },
     { page: 'editor' },
+    { page: 'level', size: 4 },
     { page: 'play', size: 4, name: 'Beginner 1' },
     { page: 'editor', size: 12, name: 'difficulty-hard' },
     { page: 'linkedIn' },

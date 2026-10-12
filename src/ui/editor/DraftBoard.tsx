@@ -3,13 +3,13 @@ import { regionLetter } from '../../core/puzzleFormat.ts'
 import type { Coord, RegionId } from '../../core/types.ts'
 import { strings } from '../../strings.ts'
 import { BoardView, type CellView } from '../BoardView.tsx'
-import { QueenIcon } from '../icons.tsx'
+import { QueenMark } from '../icons.tsx'
 import type { DraftEditor } from './useDraftEditor.ts'
 
 /** Overlays that help the author: the Solution when unique, two diverging Solutions when not. */
 function solutionOverlay(inspection: DraftInspection, cell: Coord): CellView['content'] {
   if (inspection.valid) {
-    return inspection.puzzle.solution[cell.row] === cell.col ? <QueenIcon className="is-faint" /> : null
+    return inspection.puzzle.solution[cell.row] === cell.col ? <QueenMark size={inspection.puzzle.size} className="is-faint" /> : null
   }
   const multiple = inspection.problems.find((problem) => problem.kind === 'multipleSolutions')
   if (!multiple) return null

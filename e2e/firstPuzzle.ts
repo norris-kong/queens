@@ -9,6 +9,8 @@ import { createPuzzleRepository } from '../tools/puzzleRepository.ts'
 
 export interface FirstPuzzle {
   readonly path: string
+  /** The page of its Level, listing it. */
+  readonly levelPath: string
   readonly puzzle: Puzzle
   readonly solution: readonly Coord[]
   /** A Cell outside the Solution, for placing a wrong Queen. */
@@ -25,6 +27,7 @@ export async function firstPuzzle(): Promise<FirstPuzzle> {
   const firstCol = entry.puzzle.solution[0] ?? 0
   return {
     path: routeHash({ page: 'play', size: group.size, name: entry.name }),
+    levelPath: routeHash({ page: 'level', size: group.size }),
     puzzle: entry.puzzle,
     solution,
     wrongCell: { row: 0, col: firstCol === 0 ? 1 : 0 },

@@ -3,6 +3,7 @@ import { strings } from '../strings.ts'
 import { DailyCalendarPage } from './DailyCalendarPage.tsx'
 import { DailyPlayPage } from './DailyPlayPage.tsx'
 import { HomePage } from './HomePage.tsx'
+import { LevelPage } from './LevelPage.tsx'
 import { LinkedInPage } from './LinkedInPage.tsx'
 import { LinkedInPlayPage } from './LinkedInPlayPage.tsx'
 import { NightmarePage } from './NightmarePage.tsx'
@@ -31,6 +32,8 @@ export function App() {
       return <HomePage />
     case 'rules':
       return <RulesPage />
+    case 'level':
+      return <LevelPage size={route.size} />
     case 'play':
       return <PlayPage size={route.size} name={route.name} />
     case 'linkedIn':

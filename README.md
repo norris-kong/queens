@@ -30,6 +30,14 @@ when you save. **自動出題** fills the Draft with a generated Puzzle of the c
 Regions, exactly one Solution) that you can adjust and save. A new Puzzle is named after its Level
 and the next number, e.g. `Beginner 11`; you can still type another name.
 
+### Level art
+
+The home page opens each Level from a picture button, and a Level's page numbers its Puzzles on
+badges; on the Board, a Queen is drawn as the logo of its Size's Level, and the logos grow and settle
+back when the Puzzle is Solved. The drawings live in `buttons/`; `pnpm art:levels` resizes them and
+writes the WebP files the game ships to `src/assets/levels/`. Level names and numbers are lettered
+in Cherry Bomb One, with each Level's colours set in `src/ui/levelArt.ts`.
+
 ### Daily Puzzles
 
 The home page opens with the Daily Puzzle: one Puzzle a day, the same for every player, changing at

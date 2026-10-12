@@ -2,8 +2,8 @@ import { stageSize } from '../core/nightmare.ts'
 import { library, linkedInLibrary } from '../puzzleLibrary.ts'
 import { strings } from '../strings.ts'
 import { DailyCard } from './DailyCard.tsx'
+import { LevelButton } from './LevelButton.tsx'
 import { nightmareStage, progressStore } from './progressStorage.ts'
-import { PuzzleLink } from './PuzzleLink.tsx'
 import { routeHash } from './routes.ts'
 
 function NightmareEntry() {
@@ -48,22 +48,20 @@ export function HomePage() {
       <DailyCard />
 
       {library.sizes.length === 0 && <p>{strings.emptyLibrary}</p>}
-      {library.sizes.map((group) => (
-        <section key={group.size} className="size-group" aria-labelledby={`size-${group.size}`}>
-          <h2 id={`size-${group.size}`}>{strings.levelHeading(group.size)}</h2>
-          <ul className="puzzle-list">
-            {group.puzzles.map((entry) => (
-              <li key={entry.puzzle.id}>
-                <PuzzleLink
-                  href={routeHash({ page: 'play', size: group.size, name: entry.name })}
-                  number={entry.number}
-                  puzzle={entry.puzzle}
-                />
+      {library.sizes.length > 0 && (
+        <section className="size-group" aria-labelledby="levels">
+          <h2 id="levels" className="visually-hidden">
+            {strings.levelsHeading}
+          </h2>
+          <ul className="level-grid">
+            {library.sizes.map((group) => (
+              <li key={group.size}>
+                <LevelButton size={group.size} />
               </li>
             ))}
           </ul>
         </section>
-      ))}
+      )}
       <NightmareEntry />
       <LinkedInEntry />
     </main>

@@ -1,16 +1,23 @@
-interface IconProps {
+import type { CSSProperties } from 'react'
+import { levelArt } from './levelArt.ts'
+
+interface QueenMarkProps {
+  /** The Board's Size, whose Level's logo the Queen wears. */
+  readonly size: number
   readonly className?: string
+  readonly style?: CSSProperties
 }
 
-export function QueenIcon({ className = '' }: IconProps) {
+/** A Queen, drawn as the logo of the Board's Level: an acorn on Beginner Boards, a bird on Easy ones, and so on. */
+export function QueenMark({ size, className = '', style }: QueenMarkProps) {
   return (
-    <svg className={`cell-icon queen ${className}`} viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="currentColor" d="M3 8.6 7.6 12.4 12 5.2l4.4 7.2L21 8.6 19.2 17H4.8Z" />
-      <circle cx="3" cy="7.6" r="1.6" fill="currentColor" />
-      <circle cx="12" cy="4.2" r="1.7" fill="currentColor" />
-      <circle cx="21" cy="7.6" r="1.6" fill="currentColor" />
-      <rect x="4.8" y="18.3" width="14.4" height="2.4" rx="1.1" fill="currentColor" />
-    </svg>
+    <img
+      className={`cell-icon queen ${className}`}
+      src={levelArt(size).logo}
+      alt=""
+      draggable={false}
+      style={style}
+    />
   )
 }
 

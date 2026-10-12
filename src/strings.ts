@@ -18,7 +18,8 @@ export const strings = {
   editorLink: '題目編輯器',
   backToList: '‹ 題目列表',
   sizeHeading: (size: number) => `${size} × ${size}`,
-  levelHeading: levelName,
+  levelsHeading: '等級',
+  backToLevel: (size: number) => `‹ ${levelName(size)}`,
   puzzleLabel: (number: number, name: string) => `#${number} ${name}`,
   puzzleTitle: (size: number, number: number) => `${levelName(size)} ${number}`,
   status: {
