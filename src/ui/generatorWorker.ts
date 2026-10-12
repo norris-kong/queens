@@ -1,8 +1,7 @@
-import { generatePuzzle } from '../../core/generator.ts'
-import { seededRandom } from '../../core/random.ts'
-import { MAX_SIZE, MIN_SIZE } from '../../core/rules.ts'
+import { generateSeededPuzzle } from '../core/generator.ts'
+import { MAX_SIZE, MIN_SIZE } from '../core/rules.ts'
 
-/** Runs the Puzzle generator off the main thread, so the editor stays responsive meanwhile. */
+/** Runs the Puzzle generator off the main thread, so the page stays responsive meanwhile. */
 const worker = self as unknown as { postMessage(message: unknown): void }
 
 self.addEventListener('message', (event: MessageEvent<{ size?: unknown; seed?: unknown }>) => {
@@ -11,6 +10,6 @@ self.addEventListener('message', (event: MessageEvent<{ size?: unknown; seed?: u
     worker.postMessage({ ok: false })
     return
   }
-  const puzzle = generatePuzzle(size, seededRandom(seed))
+  const puzzle = generateSeededPuzzle(size, seed)
   worker.postMessage(puzzle ? { ok: true, regions: puzzle.regions } : { ok: false })
 })

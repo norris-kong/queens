@@ -1,4 +1,4 @@
-import { type ProgressStatus, progressStatus } from '../core/progress.ts'
+import type { ProgressStatus } from '../core/progress.ts'
 import type { Puzzle } from '../core/types.ts'
 import { strings } from '../strings.ts'
 import { progressStore } from './progressStorage.ts'
@@ -16,7 +16,7 @@ export function StatusMark({ status }: { readonly status: Exclude<ProgressStatus
 
 /** A button-sized link to one Puzzle, showing only its number and how far the player got. */
 export function PuzzleLink({ href, number, puzzle }: { readonly href: string; readonly number: number; readonly puzzle: Puzzle }) {
-  const status = progressStatus(progressStore.load(puzzle))
+  const status = progressStore.status(puzzle.id)
   return (
     <a className="puzzle-link" href={href}>
       <span>{number}</span>

@@ -30,6 +30,14 @@ when you save. **自動出題** fills the Draft with a generated Puzzle of the c
 Regions, exactly one Solution) that you can adjust and save. A new Puzzle is named after its Level
 and the next number, e.g. `Beginner 11`; you can still type another name.
 
+### Daily Puzzles
+
+The home page opens with the Daily Puzzle: one Puzzle a day, the same for every player, changing at
+midnight Hong Kong time. Its Size grows through the week, from 6 on Monday to 12 on Sunday. A
+calendar from the first day (`DAILY_FIRST_DATE` in `src/config.ts`) up to today lets players catch up
+on missed days. Daily Puzzles are not files: each is generated in the browser from its date (ADR
+0002), so changing the generator changes them.
+
 ### LinkedIn Puzzles
 
 `puzzles/LinkedIn/<number>.txt` holds LinkedIn Queens puzzles under LinkedIn's own numbers, listed

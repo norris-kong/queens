@@ -1,6 +1,6 @@
-import { progressStatus } from '../core/progress.ts'
 import { library, linkedInLibrary } from '../puzzleLibrary.ts'
 import { strings } from '../strings.ts'
+import { DailyCard } from './DailyCard.tsx'
 import { progressStore } from './progressStorage.ts'
 import { PuzzleLink } from './PuzzleLink.tsx'
 import { routeHash } from './routes.ts'
@@ -8,7 +8,7 @@ import { routeHash } from './routes.ts'
 function LinkedInEntry() {
   const { puzzles } = linkedInLibrary
   if (puzzles.length === 0) return null
-  const solved = puzzles.filter((entry) => progressStatus(progressStore.load(entry.puzzle)) === 'solved').length
+  const solved = puzzles.filter((entry) => progressStore.status(entry.puzzle.id) === 'solved').length
   return (
     <section className="size-group" aria-labelledby="linkedin">
       <h2 id="linkedin">{strings.linkedInTitle}</h2>
@@ -31,6 +31,7 @@ export function HomePage() {
         </nav>
       </header>
       <p className="muted">{strings.tagline}</p>
+      <DailyCard />
 
       {library.sizes.length === 0 && <p>{strings.emptyLibrary}</p>}
       {library.sizes.map((group) => (

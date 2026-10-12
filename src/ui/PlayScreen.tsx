@@ -1,3 +1,4 @@
+import type { SaveSlot } from '../core/progress.ts'
 import { formatSolveTime } from '../core/solveTime.ts'
 import type { Puzzle } from '../core/types.ts'
 import { strings } from '../strings.ts'
@@ -14,14 +15,17 @@ export interface NextStep {
 
 interface PlayScreenProps {
   readonly puzzle: Puzzle
-  readonly persist: boolean
+  /** Where progress is kept between visits; null leaves no trace, as in an editor play-test. */
+  readonly slot: SaveSlot | null
   /** The button offered once Solved, e.g. "下一題"; omitted when there is nowhere to go. */
   readonly next?: NextStep
   /** Extra line shown once Solved, e.g. that this was the last Puzzle. */
   readonly solvedNote?: string
+  /** Runs on the Move that Solves the Puzzle. */
+  readonly onSolve?: () => void
 }
 
-function SolvedPanel({ session, next, solvedNote }: { readonly session: Session } & Omit<PlayScreenProps, 'puzzle' | 'persist'>) {
+function SolvedPanel({ session, next, solvedNote }: { readonly session: Session } & Pick<PlayScreenProps, 'next' | 'solvedNote'>) {
   return (
     <section className="solved-panel card" aria-live="polite">
       <h2>{strings.solvedTitle}</h2>
@@ -62,8 +66,8 @@ function PlayControls({ session }: { readonly session: Session }) {
   )
 }
 
-export function PlayScreen({ puzzle, persist, next, solvedNote }: PlayScreenProps) {
-  const session = usePlaySession(puzzle, { persist })
+export function PlayScreen({ puzzle, slot, next, solvedNote, onSolve }: PlayScreenProps) {
+  const session = usePlaySession(puzzle, slot, onSolve)
   const highlights = highlightsFor(puzzle, session.board)
 
   return (

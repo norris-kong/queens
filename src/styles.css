@@ -157,6 +157,20 @@ a {
 
 /* ---------- Board ---------- */
 
+/* Holds the Board's place while a generated Puzzle is on its way. */
+.board-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 560px;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+}
+
 .board {
   --size: 8;
 
@@ -371,6 +385,78 @@ a {
   color: var(--text);
   text-decoration: none;
   font-weight: 600;
+}
+
+.daily-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.daily-row .entry-link {
+  flex: 1;
+}
+
+.calendar-link {
+  flex: none;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.month-nav h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.month-nav .button {
+  min-width: 44px;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.calendar-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.calendar-day[aria-current='date'] {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.calendar-day-off {
+  border-style: dashed;
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 400;
 }
 
 .status {

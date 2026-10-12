@@ -1,6 +1,6 @@
 import { inspectDraft, isRegionConnected } from './draft.ts'
 import { filledGrid, orthogonalNeighbours, replaceCells } from './grid.ts'
-import { pick, type Random, shuffled } from './random.ts'
+import { pick, type Random, seededRandom, seedFromText, shuffled } from './random.ts'
 import { findSolutions } from './solver.ts'
 import type { Coord, DraftGrid, Puzzle, RegionGrid, RegionId, Solution } from './types.ts'
 
@@ -14,6 +14,8 @@ const SOLUTIONS_PER_LOOK = 16
 const MAX_REGION_SIZE_FACTOR = 2
 /** A single-Cell Region gives its Queen away at once, so every Region keeps at least this many Cells. */
 const MIN_REGION_SIZE = 2
+/** Seeds derived from one seed and tried in turn, should generation from the first ever fail. */
+const SEED_TRIES = 5
 
 const range = (count: number) => Array.from({ length: count }, (_, index) => index)
 
@@ -129,6 +131,20 @@ export function generatePuzzle(size: number, random: Random): Puzzle | null {
     if (!regions || !hasFairRegionSizes(regions)) continue
     const inspection = inspectDraft(inReadingOrder(regions))
     if (inspection.valid) return inspection.puzzle
+  }
+  return null
+}
+
+/**
+ * The Puzzle a seed stands for: the same seed and Size always give the same Puzzle, which is how
+ * every player gets the same Daily Puzzle and Nightmare Stage (ADR 0002). Should the seed itself
+ * fail, seeds derived from it are tried in a fixed order.
+ */
+export function generateSeededPuzzle(size: number, seed: number): Puzzle | null {
+  for (let attempt = 0; attempt < SEED_TRIES; attempt++) {
+    const random = seededRandom(attempt === 0 ? seed : seedFromText(`${seed}#${attempt}`))
+    const puzzle = generatePuzzle(size, random)
+    if (puzzle) return puzzle
   }
   return null
 }

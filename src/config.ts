@@ -17,5 +17,8 @@ export const REGION_COLORS: readonly string[] = [
 /** How often Solve Time is saved while a Puzzle is open, on top of saving after every Move. */
 export const SAVE_INTERVAL_MS = 5_000
 
+/** The first day with a Daily Puzzle (Hong Kong time); the calendar starts here. */
+export const DAILY_FIRST_DATE = '2026-10-12'
+
 /** Size a new Draft starts at in the editor. */
 export const DEFAULT_DRAFT_SIZE = 8

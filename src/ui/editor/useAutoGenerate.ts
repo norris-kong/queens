@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import type { DraftGrid, RegionGrid } from '../../core/types.ts'
 import { editorStrings as text } from './editorStrings.ts'
-import { generateInWorker } from './generateInWorker.ts'
+import { generateInWorker } from '../generateInWorker.ts'
 import { hasAssignedCells } from './draftPainting.ts'
+
+const SEED_RANGE = 2 ** 32
 
 /** The editor's 自動出題 action: replaces the Draft with a freshly generated Puzzle layout. */
 export function useAutoGenerate(size: number, draft: DraftGrid, onGenerated: (regions: RegionGrid) => void) {
@@ -13,7 +15,7 @@ export function useAutoGenerate(size: number, draft: DraftGrid, onGenerated: (re
     if (hasAssignedCells(draft) && !window.confirm(text.confirmGenerate)) return
     setGenerating(true)
     setFailed(false)
-    const regions = await generateInWorker(size)
+    const regions = await generateInWorker(size, Math.floor(Math.random() * SEED_RANGE))
     setGenerating(false)
     if (regions) onGenerated(regions)
     else setFailed(true)

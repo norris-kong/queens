@@ -1,7 +1,9 @@
+import { saveSlot } from '../core/progress.ts'
 import { library } from '../puzzleLibrary.ts'
 import { strings } from '../strings.ts'
 import { findEntry, nextEntry } from './libraryLookup.ts'
 import { PlayScreen } from './PlayScreen.tsx'
+import { progressStore } from './progressStorage.ts'
 import { routeHash } from './routes.ts'
 import { navigate } from './useHashRoute.ts'
 
@@ -27,7 +29,7 @@ export function PlayPage({ size, name }: PlayPageProps) {
           // A fresh session per Puzzle, so moving to the next Puzzle starts clean.
           key={located.entry.puzzle.id}
           puzzle={located.entry.puzzle}
-          persist
+          slot={saveSlot(progressStore, located.entry.puzzle.id, located.entry.puzzle)}
           next={
             next
               ? { label: strings.nextPuzzle, go: () => navigate({ page: 'play', size: next.size, name: next.entry.name }) }

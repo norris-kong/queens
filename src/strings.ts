@@ -1,5 +1,14 @@
+import { type DailyDate, dailySize, weekdayOf } from './core/daily.ts'
 import type { HintKind } from './core/hint.ts'
 import { levelName } from './core/level.ts'
+
+const WEEKDAY_NAMES = ['日', '一', '二', '三', '四', '五', '六']
+
+/** "10月12日（一）" */
+function dayLabel(date: DailyDate): string {
+  const [, month, day] = date.split('-').map(Number)
+  return `${month}月${day}日（${WEEKDAY_NAMES[weekdayOf(date)]}）`
+}
 
 /** Every piece of interface text, in one place so another language can be added later. */
 export const strings = {
@@ -33,6 +42,26 @@ export const strings = {
   nextPuzzle: '下一題',
   replay: '重玩',
   lastPuzzle: '這是最後一題了！',
+
+  dailyHeading: '每日題目',
+  dayLabel,
+  dailyCardLine: (date: DailyDate) => `${dayLabel(date)} · ${levelName(dailySize(date))}`,
+  dailyTitle: (date: DailyDate) => `每日題目 · ${dayLabel(date)}`,
+  dailyLevel: (date: DailyDate) => levelName(dailySize(date)),
+  calendarLink: '月曆 ›',
+  backToCalendar: '‹ 月曆',
+  backToCalendarButton: '回月曆',
+  dailyUnavailable: '這一天沒有每日題目。',
+  monthTitle: (month: string) => {
+    const [year, monthNumber] = month.split('-').map(Number)
+    return `${year} 年 ${monthNumber} 月`
+  },
+  previousMonth: '上個月',
+  nextMonth: '下個月',
+  /** Calendar column headings, Monday first, so each week reads from the smallest Size to the largest. */
+  calendarWeekdays: ['一', '二', '三', '四', '五', '六', '日'],
+  generating: '出題中…',
+  generateFailed: '這次沒能出好題目，請重新整理再試一次。',
 
   linkedInTitle: 'LinkedIn Queens',
   linkedInEntry: (count: number, solved: number) => `${count} 題 · 已通關 ${solved}`,

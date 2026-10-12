@@ -1,5 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { strings } from '../strings.ts'
+import { DailyCalendarPage } from './DailyCalendarPage.tsx'
+import { DailyPlayPage } from './DailyPlayPage.tsx'
 import { HomePage } from './HomePage.tsx'
 import { LinkedInPage } from './LinkedInPage.tsx'
 import { LinkedInPlayPage } from './LinkedInPlayPage.tsx'
@@ -34,6 +36,10 @@ export function App() {
       return <LinkedInPage />
     case 'linkedInPlay':
       return <LinkedInPlayPage number={route.number} />
+    case 'daily':
+      return <DailyCalendarPage />
+    case 'dailyPlay':
+      return <DailyPlayPage date={route.date} />
     case 'editor':
       return EditorPage ? (
         <Suspense fallback={null}>

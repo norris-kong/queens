@@ -5,10 +5,13 @@ export type Route =
   | { readonly page: 'editor'; readonly size?: number; readonly name?: string }
   | { readonly page: 'linkedIn' }
   | { readonly page: 'linkedInPlay'; readonly number: number }
+  | { readonly page: 'daily' }
+  | { readonly page: 'dailyPlay'; readonly date: string }
   | { readonly page: 'notFound' }
 
 const PUZZLE_PATH = /^\/(play|editor)\/(\d+)\/([^/]+)$/
 const LINKEDIN_PATH = /^\/linkedin\/([1-9]\d*)$/
+const DAILY_PATH = /^\/daily\/(\d{4}-\d{2}-\d{2})$/
 
 function decodeName(escaped: string): string | null {
   try {
@@ -27,6 +30,9 @@ export function parseRoute(hash: string): Route {
   if (path === '/linkedin') return { page: 'linkedIn' }
   const linkedIn = LINKEDIN_PATH.exec(path)
   if (linkedIn) return { page: 'linkedInPlay', number: Number(linkedIn[1]) }
+  if (path === '/daily') return { page: 'daily' }
+  const daily = DAILY_PATH.exec(path)
+  if (daily?.[1]) return { page: 'dailyPlay', date: daily[1] }
   const match = PUZZLE_PATH.exec(path)
   const name = decodeName(match?.[3] ?? '')
   if (!match || !name) return { page: 'notFound' }
@@ -50,5 +56,9 @@ export function routeHash(route: Route): string {
       return '#/linkedin'
     case 'linkedInPlay':
       return `#/linkedin/${route.number}`
+    case 'daily':
+      return '#/daily'
+    case 'dailyPlay':
+      return `#/daily/${route.date}`
   }
 }

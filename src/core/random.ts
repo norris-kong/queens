@@ -13,6 +13,15 @@ export function seededRandom(seed: number): Random {
   }
 }
 
+/** A 32-bit seed from text (FNV-1a), e.g. "daily:2026-10-12"; the same text always gives the same seed. */
+export function seedFromText(text: string): number {
+  let hash = 0x811c9dc5
+  for (let i = 0; i < text.length; i++) {
+    hash = Math.imul(hash ^ text.charCodeAt(i), 0x01000193)
+  }
+  return hash >>> 0
+}
+
 export function pick<T>(items: readonly T[], random: Random): T | undefined {
   return items[Math.floor(random() * items.length)]
 }

@@ -23,7 +23,7 @@ export default function EditorPage(stored: Partial<FileRef>) {
           </button>
           <h1>{text.playtest}</h1>
         </header>
-        <PlayScreen key={editor.inspection.puzzle.id} puzzle={editor.inspection.puzzle} persist={false} />
+        <PlayScreen key={editor.inspection.puzzle.id} puzzle={editor.inspection.puzzle} slot={null} />
       </main>
     )
   }

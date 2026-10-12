@@ -1,7 +1,9 @@
 import { nextLinkedIn } from '../core/linkedInCatalog.ts'
+import { saveSlot } from '../core/progress.ts'
 import { linkedInLibrary } from '../puzzleLibrary.ts'
 import { strings } from '../strings.ts'
 import { PlayScreen } from './PlayScreen.tsx'
+import { progressStore } from './progressStorage.ts'
 import { routeHash } from './routes.ts'
 import { navigate } from './useHashRoute.ts'
 
@@ -21,7 +23,7 @@ export function LinkedInPlayPage({ number }: { readonly number: number }) {
         <PlayScreen
           key={entry.puzzle.id}
           puzzle={entry.puzzle}
-          persist
+          slot={saveSlot(progressStore, entry.puzzle.id, entry.puzzle)}
           next={next ? { label: strings.nextPuzzle, go: () => navigate({ page: 'linkedInPlay', number: next.number }) } : undefined}
           solvedNote={next ? undefined : strings.lastPuzzle}
         />

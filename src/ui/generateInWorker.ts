@@ -1,15 +1,13 @@
 import { z } from 'zod'
-import type { RegionGrid } from '../../core/types.ts'
+import type { RegionGrid } from '../core/types.ts'
 
 const replySchema = z.discriminatedUnion('ok', [
   z.object({ ok: z.literal(true), regions: z.array(z.array(z.number().int())) }),
   z.object({ ok: z.literal(false) }),
 ])
 
-const SEED_RANGE = 2 ** 32
-
-/** Generates a Puzzle layout of the given Size in a Web Worker; null if generation failed. */
-export function generateInWorker(size: number): Promise<RegionGrid | null> {
+/** Generates the Puzzle layout a seed stands for (see generateSeededPuzzle) in a Web Worker; null if it failed. */
+export function generateInWorker(size: number, seed: number): Promise<RegionGrid | null> {
   return new Promise((resolve) => {
     const worker = new Worker(new URL('./generatorWorker.ts', import.meta.url), { type: 'module' })
     const finish = (regions: RegionGrid | null) => {
@@ -25,6 +23,6 @@ export function generateInWorker(size: number): Promise<RegionGrid | null> {
       console.error('Puzzle generator failed', event.message)
       finish(null)
     })
-    worker.postMessage({ size, seed: Math.floor(Math.random() * SEED_RANGE) })
+    worker.postMessage({ size, seed })
   })
 }

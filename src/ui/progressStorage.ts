@@ -23,4 +23,9 @@ function browserStorage(): StorageLike {
   }
 }
 
-export const progressStore = createProgressStore(browserStorage())
+const storage = browserStorage()
+
+/** The library's and LinkedIn's Puzzles, one save per Puzzle. */
+export const progressStore = createProgressStore(storage)
+/** Daily Puzzles, one save per day; kept apart so clearing stale library saves never touches them. */
+export const dailyStore = createProgressStore(storage, 'queens.daily.')

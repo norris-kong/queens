@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { inspectDraft } from './draft.ts'
-import { generatePuzzle } from './generator.ts'
+import { generatePuzzle, generateSeededPuzzle } from './generator.ts'
 import { seededRandom } from './random.ts'
 import type { Puzzle } from './types.ts'
 
@@ -52,5 +52,18 @@ describe('generatePuzzle', () => {
     const firstSeen = [...new Set(puzzleOfSize(9)?.regions.flat())]
 
     expect(firstSeen).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8])
+  })
+})
+
+describe('generateSeededPuzzle', () => {
+  it('gives the same Puzzle for the same seed, so every player sees the same one', () => {
+    const first = generateSeededPuzzle(6, 20261012)
+
+    expect(first && inspectDraft(first.regions).valid).toBe(true)
+    expect(generateSeededPuzzle(6, 20261012)).toEqual(first)
+  })
+
+  it('gives another Puzzle for another seed', () => {
+    expect(generateSeededPuzzle(6, 1)?.id).not.toBe(generateSeededPuzzle(6, 2)?.id)
   })
 })
