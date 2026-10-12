@@ -33,9 +33,8 @@ export function PlayPage({ size, name }: PlayPageProps) {
           next={
             next
               ? { label: strings.nextPuzzle, go: () => navigate({ page: 'play', size: next.size, name: next.entry.name }) }
-              : undefined
+              : { label: strings.toNightmare, go: () => navigate({ page: 'nightmare' }) }
           }
-          solvedNote={next ? undefined : strings.lastPuzzle}
         />
       ) : (
         <p>{strings.puzzleNotFound}</p>

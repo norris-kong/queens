@@ -11,10 +11,11 @@ interface GeneratedPlayProps {
   readonly slotFor: (puzzle: Puzzle) => SaveSlot
   readonly next?: NextStep
   readonly onSolve?: () => void
+  readonly canReplay?: boolean
 }
 
 /** Plays the Puzzle a seed stands for, showing a placeholder Board while it is being generated. */
-export function GeneratedPlay({ size, seed, slotFor, next, onSolve }: GeneratedPlayProps) {
+export function GeneratedPlay({ size, seed, slotFor, next, onSolve, canReplay }: GeneratedPlayProps) {
   const generated = useGeneratedPuzzle(size, seed)
 
   if (generated.state === 'generating') {
@@ -32,6 +33,7 @@ export function GeneratedPlay({ size, seed, slotFor, next, onSolve }: GeneratedP
       slot={slotFor(generated.puzzle)}
       next={next}
       onSolve={onSolve}
+      canReplay={canReplay}
     />
   )
 }

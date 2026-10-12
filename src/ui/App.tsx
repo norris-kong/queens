@@ -5,6 +5,7 @@ import { DailyPlayPage } from './DailyPlayPage.tsx'
 import { HomePage } from './HomePage.tsx'
 import { LinkedInPage } from './LinkedInPage.tsx'
 import { LinkedInPlayPage } from './LinkedInPlayPage.tsx'
+import { NightmarePage } from './NightmarePage.tsx'
 import { PlayPage } from './PlayPage.tsx'
 import { routeHash } from './routes.ts'
 import { RulesPage } from './RulesPage.tsx'
@@ -40,6 +41,8 @@ export function App() {
       return <DailyCalendarPage />
     case 'dailyPlay':
       return <DailyPlayPage date={route.date} />
+    case 'nightmare':
+      return <NightmarePage />
     case 'editor':
       return EditorPage ? (
         <Suspense fallback={null}>

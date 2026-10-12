@@ -23,18 +23,22 @@ interface PlayScreenProps {
   readonly solvedNote?: string
   /** Runs on the Move that Solves the Puzzle. */
   readonly onSolve?: () => void
+  /** Offer "重玩" once Solved; off where players only move forward, as in Nightmare. */
+  readonly canReplay?: boolean
 }
 
-function SolvedPanel({ session, next, solvedNote }: { readonly session: Session } & Pick<PlayScreenProps, 'next' | 'solvedNote'>) {
+function SolvedPanel({ session, next, solvedNote, canReplay = true }: { readonly session: Session } & Pick<PlayScreenProps, 'next' | 'solvedNote' | 'canReplay'>) {
   return (
     <section className="solved-panel card" aria-live="polite">
       <h2>{strings.solvedTitle}</h2>
       <p className="muted">{strings.solvedStats(formatSolveTime(session.solvedTimeMs ?? 0), session.hintsUsed)}</p>
       {solvedNote && <p>{solvedNote}</p>}
       <div className="button-row">
-        <button type="button" className="button" onClick={session.replay}>
-          {strings.replay}
-        </button>
+        {canReplay && (
+          <button type="button" className="button" onClick={session.replay}>
+            {strings.replay}
+          </button>
+        )}
         {next && (
           <button type="button" className="button button-primary" onClick={next.go}>
             {next.label}
@@ -66,7 +70,7 @@ function PlayControls({ session }: { readonly session: Session }) {
   )
 }
 
-export function PlayScreen({ puzzle, slot, next, solvedNote, onSolve }: PlayScreenProps) {
+export function PlayScreen({ puzzle, slot, next, solvedNote, onSolve, canReplay }: PlayScreenProps) {
   const session = usePlaySession(puzzle, slot, onSolve)
   const highlights = highlightsFor(puzzle, session.board)
 
@@ -82,7 +86,7 @@ export function PlayScreen({ puzzle, slot, next, solvedNote, onSolve }: PlayScre
         onCommit={session.commitDrag}
       />
       {session.solved ? (
-        <SolvedPanel session={session} next={next} solvedNote={solvedNote} />
+        <SolvedPanel session={session} next={next} solvedNote={solvedNote} canReplay={canReplay} />
       ) : (
         <PlayControls session={session} />
       )}

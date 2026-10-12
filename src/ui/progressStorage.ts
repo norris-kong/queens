@@ -1,3 +1,4 @@
+import { createNightmareStore } from '../core/nightmare.ts'
 import { createProgressStore, type StorageLike } from '../core/progress.ts'
 
 /** Used when the browser blocks localStorage: progress then lasts until the tab closes. */
@@ -29,3 +30,7 @@ const storage = browserStorage()
 export const progressStore = createProgressStore(storage)
 /** Daily Puzzles, one save per day; kept apart so clearing stale library saves never touches them. */
 export const dailyStore = createProgressStore(storage, 'queens.daily.')
+/** The current Nightmare Stage's progress, kept under its Stage number. */
+export const nightmareProgress = createProgressStore(storage, 'queens.nightmare.')
+/** Which Nightmare Stage the player has reached. */
+export const nightmareStage = createNightmareStore(storage)

@@ -1,9 +1,23 @@
+import { stageSize } from '../core/nightmare.ts'
 import { library, linkedInLibrary } from '../puzzleLibrary.ts'
 import { strings } from '../strings.ts'
 import { DailyCard } from './DailyCard.tsx'
-import { progressStore } from './progressStorage.ts'
+import { nightmareStage, progressStore } from './progressStorage.ts'
 import { PuzzleLink } from './PuzzleLink.tsx'
 import { routeHash } from './routes.ts'
+
+function NightmareEntry() {
+  const stage = nightmareStage.currentStage()
+  return (
+    <section className="size-group" aria-labelledby="nightmare">
+      <h2 id="nightmare">{strings.nightmareHeading}</h2>
+      <a className="entry-link" href={routeHash({ page: 'nightmare' })}>
+        <span>{strings.nightmareEntry(stage, stageSize(stage))}</span>
+        <span aria-hidden="true">›</span>
+      </a>
+    </section>
+  )
+}
 
 function LinkedInEntry() {
   const { puzzles } = linkedInLibrary
@@ -50,6 +64,7 @@ export function HomePage() {
           </ul>
         </section>
       ))}
+      <NightmareEntry />
       <LinkedInEntry />
     </main>
   )

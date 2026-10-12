@@ -7,6 +7,7 @@ export type Route =
   | { readonly page: 'linkedInPlay'; readonly number: number }
   | { readonly page: 'daily' }
   | { readonly page: 'dailyPlay'; readonly date: string }
+  | { readonly page: 'nightmare' }
   | { readonly page: 'notFound' }
 
 const PUZZLE_PATH = /^\/(play|editor)\/(\d+)\/([^/]+)$/
@@ -31,6 +32,7 @@ export function parseRoute(hash: string): Route {
   const linkedIn = LINKEDIN_PATH.exec(path)
   if (linkedIn) return { page: 'linkedInPlay', number: Number(linkedIn[1]) }
   if (path === '/daily') return { page: 'daily' }
+  if (path === '/nightmare') return { page: 'nightmare' }
   const daily = DAILY_PATH.exec(path)
   if (daily?.[1]) return { page: 'dailyPlay', date: daily[1] }
   const match = PUZZLE_PATH.exec(path)
@@ -60,5 +62,7 @@ export function routeHash(route: Route): string {
       return '#/daily'
     case 'dailyPlay':
       return `#/daily/${route.date}`
+    case 'nightmare':
+      return '#/nightmare'
   }
 }

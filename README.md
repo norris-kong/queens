@@ -38,6 +38,13 @@ calendar from the first day (`DAILY_FIRST_DATE` in `src/config.ts`) up to today 
 on missed days. Daily Puzzles are not files: each is generated in the browser from its date (ADR
 0002), so changing the generator changes them.
 
+### Nightmare
+
+After Master comes Nightmare, an endless run of Stages: solving one generates the next. Stages 1–5
+are Size 6, and every five Stages add one, up to Size 12 from Stage 31 on. Every player's Stage N is
+the same Puzzle, generated from its number like the Daily Puzzles; players only move forward, and
+only the Stage reached is kept, in the browser.
+
 ### LinkedIn Puzzles
 
 `puzzles/LinkedIn/<number>.txt` holds LinkedIn Queens puzzles under LinkedIn's own numbers, listed

@@ -63,6 +63,12 @@ export const strings = {
   generating: '出題中…',
   generateFailed: '這次沒能出好題目，請重新整理再試一次。',
 
+  nightmareHeading: 'Nightmare',
+  nightmareEntry: (stage: number, size: number) => `第 ${stage} 關 · ${size} × ${size}`,
+  nightmareTitle: (stage: number) => `Nightmare 第 ${stage} 關`,
+  nextStage: '下一關',
+  toNightmare: '挑戰 Nightmare',
+
   linkedInTitle: 'LinkedIn Queens',
   linkedInEntry: (count: number, solved: number) => `${count} 題 · 已通關 ${solved}`,
   linkedInNote:

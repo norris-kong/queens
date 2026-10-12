@@ -31,6 +31,15 @@ export async function firstPuzzle(): Promise<FirstPuzzle> {
   }
 }
 
+/** The last Puzzle of the library (the last Master one), whose solving leads on to Nightmare. */
+export async function lastPuzzle(): Promise<{ readonly path: string; readonly puzzle: Puzzle }> {
+  const files = await createPuzzleRepository(fileURLToPath(new URL('../puzzles', import.meta.url))).list()
+  const group = buildCatalog(files).sizes.at(-1)
+  const entry = group?.puzzles.at(-1)
+  if (!group || !entry) throw new Error('The puzzle library is empty; E2E needs at least one Puzzle')
+  return { path: routeHash({ page: 'play', size: group.size, name: entry.name }), puzzle: entry.puzzle }
+}
+
 /** The LinkedIn Puzzles, read the way the game reads them. */
 export async function linkedInPuzzles(): Promise<LinkedInCatalog> {
   const folder = fileURLToPath(new URL('../puzzles/LinkedIn', import.meta.url))

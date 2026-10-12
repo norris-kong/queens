@@ -12,6 +12,7 @@ describe('hash routes', () => {
     { page: 'linkedInPlay', number: 250 },
     { page: 'daily' },
     { page: 'dailyPlay', date: '2026-10-12' },
+    { page: 'nightmare' },
   ])('reads back the hash it writes for %j', (route) => {
     expect(parseRoute(routeHash(route))).toEqual(route)
   })
