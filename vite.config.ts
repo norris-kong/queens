@@ -12,7 +12,7 @@ export default defineConfig({
     include: ['src/**/*.test.ts', 'tools/**/*.test.ts'],
     coverage: {
       include: ['src/core/**/*.ts', 'tools/**/*.ts'],
-      exclude: ['**/*.test.ts', 'src/core/testing.ts', 'tools/puzzleEditorPlugin.ts'],
+      exclude: ['**/*.test.ts', 'src/core/testing.ts', 'tools/puzzleEditorPlugin.ts', 'tools/importLinkedIn.ts'],
       thresholds: { lines: 80, functions: 80, branches: 80, statements: 80 },
     },
   },

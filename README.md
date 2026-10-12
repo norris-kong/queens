@@ -30,6 +30,15 @@ when you save. **自動出題** fills the Draft with a generated Puzzle of the c
 Regions, exactly one Solution) that you can adjust and save. A new Puzzle is named after its Level
 and the next number, e.g. `Beginner 11`; you can still type another name.
 
+### LinkedIn Puzzles
+
+`puzzles/LinkedIn/<number>.txt` holds LinkedIn Queens puzzles under LinkedIn's own numbers, listed
+on their own page and credited there. They come from the community archive behind
+[archivedqueens.com](https://www.archivedqueens.com/); `pnpm import:linkedin` downloads it again and
+rewrites the folder, skipping the archive's few broken entries. The puzzles are LinkedIn's; this
+project is not affiliated with LinkedIn or Microsoft. The editor never shows them, and refuses to
+save a copy of one.
+
 ## Deploy
 
 Pushing to `main` runs lint, unit tests, E2E and the build in GitHub Actions, then publishes `dist/`

@@ -5,6 +5,8 @@ import type { Puzzle } from './types.ts'
 /** Puzzle files live at `puzzles/<two-digit size>/<Puzzle Name>.txt`, e.g. `puzzles/08/spiral.txt`. */
 export const PUZZLE_EXTENSION = '.txt'
 export const SIZE_FOLDER = /^\d{2}$/
+/** LinkedIn Puzzles live apart from the author's, at `puzzles/LinkedIn/<LinkedIn number>.txt`. */
+export const LINKEDIN_FOLDER = 'LinkedIn'
 
 export function sizeFolder(size: number): string {
   return String(size).padStart(2, '0')

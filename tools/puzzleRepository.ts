@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import type { FileRef, PuzzleFile } from '../src/core/catalog.ts'
 import type { DraftProblem } from '../src/core/draft.ts'
 import { puzzleId } from '../src/core/identity.ts'
-import { PUZZLE_EXTENSION, readPuzzle, SIZE_FOLDER, sizeFolder } from '../src/core/puzzleFile.ts'
+import { LINKEDIN_FOLDER, PUZZLE_EXTENSION, readPuzzle, SIZE_FOLDER, sizeFolder } from '../src/core/puzzleFile.ts'
 import { formatPuzzle, type ParseError, parsePuzzle } from '../src/core/puzzleFormat.ts'
 import { isValidPuzzleName, samePuzzleName } from '../src/core/puzzleName.ts'
 import { MAX_SIZE, MIN_SIZE } from '../src/core/rules.ts'
@@ -23,6 +23,7 @@ export type RepositoryError =
   | { readonly kind: 'wrongSize'; readonly actualSize: number }
   | { readonly kind: 'nameTaken' }
   | { readonly kind: 'duplicate'; readonly sameAs: FileRef }
+  | { readonly kind: 'linkedInDuplicate'; readonly number: number }
   | { readonly kind: 'notFound' }
 
 export type RepositoryResult = { readonly ok: true } | { readonly ok: false; readonly error: RepositoryError }
@@ -75,6 +76,16 @@ async function listFolder(root: string, folder: string): Promise<PuzzleFile[]> {
   )
 }
 
+/** The LinkedIn Puzzles, which the editor never writes but must not copy either. */
+async function listLinkedIn(root: string): Promise<PuzzleFile[]> {
+  try {
+    return await listFolder(root, LINKEDIN_FOLDER)
+  } catch (error) {
+    if (isMissing(error)) return []
+    throw error
+  }
+}
+
 async function listPuzzles(root: string): Promise<PuzzleFile[]> {
   try {
     const entries = await readdir(root, { withFileTypes: true })
@@ -102,6 +113,8 @@ async function savePuzzle(root: string, request: SaveRequest): Promise<Repositor
   const sameSize = (await listPuzzles(root)).filter((file) => file.size === request.size)
   const clash = findClash(request, checked.puzzle, sameSize)
   if (clash) return failure(clash)
+  const linkedIn = (await listLinkedIn(root)).find((file) => storedId(file) === checked.puzzle.id)
+  if (linkedIn) return failure({ kind: 'linkedInDuplicate', number: Number(linkedIn.name) })
 
   await mkdir(join(root, sizeFolder(request.size)), { recursive: true })
   const { previousName } = request

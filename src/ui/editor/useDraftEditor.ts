@@ -22,8 +22,9 @@ function reloadAt(route: Route): void {
 
 function errorText(result: EditorResult): string | null {
   if (result.ok) return null
-  const { kind, sameAs } = result.error
-  return sameAs ? text.errors[kind] + text.duplicateOf(sameAs.size, sameAs.name) : text.errors[kind]
+  const { kind, sameAs, number } = result.error
+  if (sameAs) return text.errors[kind] + text.duplicateOf(sameAs.size, sameAs.name)
+  return number === undefined ? text.errors[kind] : text.errors[kind] + text.linkedInNumber(number)
 }
 
 /** The name a new Puzzle of this Size is offered, following the ones already in the library. */

@@ -79,6 +79,16 @@ describe('puzzle repository', () => {
 
     expect(result).toEqual({ ok: false, error: { kind: 'duplicate', sameAs: { size: 4, name: 'corner' } } })
   })
+
+  it('refuses a copy of a LinkedIn Puzzle, naming its LinkedIn number', async () => {
+    await mkdir(join(root, 'LinkedIn'))
+    await writeFile(join(root, 'LinkedIn', '250.txt'), FOUR)
+
+    const result = await repository.save({ size: 4, name: 'Beginner 1', text: FOUR })
+
+    expect(result).toEqual({ ok: false, error: { kind: 'linkedInDuplicate', number: 250 } })
+    expect(await repository.list()).toEqual([])
+  })
 })
 
 describe('editing stored Puzzles', () => {

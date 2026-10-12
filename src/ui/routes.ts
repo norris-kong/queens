@@ -3,9 +3,12 @@ export type Route =
   | { readonly page: 'rules' }
   | { readonly page: 'play'; readonly size: number; readonly name: string }
   | { readonly page: 'editor'; readonly size?: number; readonly name?: string }
+  | { readonly page: 'linkedIn' }
+  | { readonly page: 'linkedInPlay'; readonly number: number }
   | { readonly page: 'notFound' }
 
 const PUZZLE_PATH = /^\/(play|editor)\/(\d+)\/([^/]+)$/
+const LINKEDIN_PATH = /^\/linkedin\/([1-9]\d*)$/
 
 function decodeName(escaped: string): string | null {
   try {
@@ -21,6 +24,9 @@ export function parseRoute(hash: string): Route {
   if (path === '/') return { page: 'home' }
   if (path === '/rules') return { page: 'rules' }
   if (path === '/editor') return { page: 'editor' }
+  if (path === '/linkedin') return { page: 'linkedIn' }
+  const linkedIn = LINKEDIN_PATH.exec(path)
+  if (linkedIn) return { page: 'linkedInPlay', number: Number(linkedIn[1]) }
   const match = PUZZLE_PATH.exec(path)
   const name = decodeName(match?.[3] ?? '')
   if (!match || !name) return { page: 'notFound' }
@@ -40,5 +46,9 @@ export function routeHash(route: Route): string {
       return route.size === undefined || route.name === undefined
         ? '#/editor'
         : `#/editor/${route.size}/${encodeURIComponent(route.name)}`
+    case 'linkedIn':
+      return '#/linkedin'
+    case 'linkedInPlay':
+      return `#/linkedin/${route.number}`
   }
 }

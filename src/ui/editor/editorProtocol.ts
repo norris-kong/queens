@@ -11,6 +11,7 @@ export const EDITOR_ERROR_KINDS = [
   'wrongSize',
   'nameTaken',
   'duplicate',
+  'linkedInDuplicate',
   'notFound',
   'badRequest',
   'serverError',
@@ -26,6 +27,7 @@ export const editorResultSchema = z.discriminatedUnion('ok', [
     error: z.object({
       kind: z.enum(EDITOR_ERROR_KINDS),
       sameAs: z.object({ size: z.number(), name: z.string() }).optional(),
+      number: z.number().optional(),
     }),
   }),
 ])

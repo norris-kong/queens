@@ -55,10 +55,12 @@ export const editorStrings = {
     wrongSize: '題目尺寸與資料夾不符。',
     nameTaken: '這個尺寸已經有同名的題目。',
     duplicate: '題庫裡已經有一模一樣的題目。',
+    linkedInDuplicate: '這和一題 LinkedIn 題目一模一樣。',
     notFound: '原本的題目已經不存在。',
     badRequest: '請求格式錯誤。',
     serverError: '開發伺服器發生錯誤，請看終端機的訊息。',
     network: '連不到開發伺服器，請確認 pnpm dev 正在執行。',
   } satisfies Record<EditorErrorKind, string>,
   duplicateOf: (size: number, name: string) => `（與 ${size}/${name} 相同）`,
+  linkedInNumber: (number: number) => `（LinkedIn #${number}）`,
 } as const

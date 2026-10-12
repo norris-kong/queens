@@ -34,6 +34,13 @@ export const strings = {
   replay: '重玩',
   lastPuzzle: '這是最後一題了！',
 
+  linkedInTitle: 'LinkedIn Queens',
+  linkedInEntry: (count: number, solved: number) => `${count} 題 · 已通關 ${solved}`,
+  linkedInNote:
+    '這些題目出自 LinkedIn 的每日遊戲 Queens，版權屬於 LinkedIn，經由社群整理的 archivedqueens.com 收集。本站是獨立的同好作品，與 LinkedIn、Microsoft 無關。',
+  linkedInPuzzleTitle: (number: number) => `LinkedIn #${number}`,
+  backToLinkedIn: '‹ LinkedIn 題目',
+
   cellLabel: (row: number, col: number, state: string) => `第 ${row + 1} 列第 ${col + 1} 行，${state}`,
   cellStates: { empty: '空白', mark: 'X', queen: '皇后' },
   boardLabel: '盤面',

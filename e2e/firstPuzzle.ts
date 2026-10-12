@@ -1,5 +1,8 @@
+import { readdir, readFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { buildCatalog } from '../src/core/catalog.ts'
+import { buildLinkedInCatalog, type LinkedInCatalog } from '../src/core/linkedInCatalog.ts'
 import type { Coord, Puzzle } from '../src/core/types.ts'
 import { routeHash } from '../src/ui/routes.ts'
 import { createPuzzleRepository } from '../tools/puzzleRepository.ts'
@@ -26,4 +29,14 @@ export async function firstPuzzle(): Promise<FirstPuzzle> {
     solution,
     wrongCell: { row: 0, col: firstCol === 0 ? 1 : 0 },
   }
+}
+
+/** The LinkedIn Puzzles, read the way the game reads them. */
+export async function linkedInPuzzles(): Promise<LinkedInCatalog> {
+  const folder = fileURLToPath(new URL('../puzzles/LinkedIn', import.meta.url))
+  const names = (await readdir(folder)).filter((file) => file.endsWith('.txt'))
+  const files = await Promise.all(
+    names.map(async (file) => ({ name: file.slice(0, -'.txt'.length), text: await readFile(join(folder, file), 'utf8') })),
+  )
+  return buildLinkedInCatalog(files, new Set())
 }

@@ -7,16 +7,21 @@ import { usePlaySession } from './usePlaySession.ts'
 
 type Session = ReturnType<typeof usePlaySession>
 
+export interface NextStep {
+  readonly label: string
+  readonly go: () => void
+}
+
 interface PlayScreenProps {
   readonly puzzle: Puzzle
   readonly persist: boolean
-  /** Where "下一題" leads; omitted when there is no next Puzzle. */
-  readonly onNext?: () => void
+  /** The button offered once Solved, e.g. "下一題"; omitted when there is nowhere to go. */
+  readonly next?: NextStep
   /** Extra line shown once Solved, e.g. that this was the last Puzzle. */
   readonly solvedNote?: string
 }
 
-function SolvedPanel({ session, onNext, solvedNote }: { readonly session: Session } & Omit<PlayScreenProps, 'puzzle' | 'persist'>) {
+function SolvedPanel({ session, next, solvedNote }: { readonly session: Session } & Omit<PlayScreenProps, 'puzzle' | 'persist'>) {
   return (
     <section className="solved-panel card" aria-live="polite">
       <h2>{strings.solvedTitle}</h2>
@@ -26,9 +31,9 @@ function SolvedPanel({ session, onNext, solvedNote }: { readonly session: Sessio
         <button type="button" className="button" onClick={session.replay}>
           {strings.replay}
         </button>
-        {onNext && (
-          <button type="button" className="button button-primary" onClick={onNext}>
-            {strings.nextPuzzle}
+        {next && (
+          <button type="button" className="button button-primary" onClick={next.go}>
+            {next.label}
           </button>
         )}
       </div>
@@ -57,7 +62,7 @@ function PlayControls({ session }: { readonly session: Session }) {
   )
 }
 
-export function PlayScreen({ puzzle, persist, onNext, solvedNote }: PlayScreenProps) {
+export function PlayScreen({ puzzle, persist, next, solvedNote }: PlayScreenProps) {
   const session = usePlaySession(puzzle, { persist })
   const highlights = highlightsFor(puzzle, session.board)
 
@@ -73,7 +78,7 @@ export function PlayScreen({ puzzle, persist, onNext, solvedNote }: PlayScreenPr
         onCommit={session.commitDrag}
       />
       {session.solved ? (
-        <SolvedPanel session={session} onNext={onNext} solvedNote={solvedNote} />
+        <SolvedPanel session={session} next={next} solvedNote={solvedNote} />
       ) : (
         <PlayControls session={session} />
       )}

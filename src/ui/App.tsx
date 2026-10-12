@@ -1,6 +1,8 @@
 import { lazy, Suspense } from 'react'
 import { strings } from '../strings.ts'
 import { HomePage } from './HomePage.tsx'
+import { LinkedInPage } from './LinkedInPage.tsx'
+import { LinkedInPlayPage } from './LinkedInPlayPage.tsx'
 import { PlayPage } from './PlayPage.tsx'
 import { routeHash } from './routes.ts'
 import { RulesPage } from './RulesPage.tsx'
@@ -28,6 +30,10 @@ export function App() {
       return <RulesPage />
     case 'play':
       return <PlayPage size={route.size} name={route.name} />
+    case 'linkedIn':
+      return <LinkedInPage />
+    case 'linkedInPlay':
+      return <LinkedInPlayPage number={route.number} />
     case 'editor':
       return EditorPage ? (
         <Suspense fallback={null}>

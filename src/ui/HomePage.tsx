@@ -1,8 +1,24 @@
 import { progressStatus } from '../core/progress.ts'
-import { library } from '../puzzleLibrary.ts'
+import { library, linkedInLibrary } from '../puzzleLibrary.ts'
 import { strings } from '../strings.ts'
 import { progressStore } from './progressStorage.ts'
+import { PuzzleLink } from './PuzzleLink.tsx'
 import { routeHash } from './routes.ts'
+
+function LinkedInEntry() {
+  const { puzzles } = linkedInLibrary
+  if (puzzles.length === 0) return null
+  const solved = puzzles.filter((entry) => progressStatus(progressStore.load(entry.puzzle)) === 'solved').length
+  return (
+    <section className="size-group" aria-labelledby="linkedin">
+      <h2 id="linkedin">{strings.linkedInTitle}</h2>
+      <a className="entry-link" href={routeHash({ page: 'linkedIn' })}>
+        <span>{strings.linkedInEntry(puzzles.length, solved)}</span>
+        <span aria-hidden="true">›</span>
+      </a>
+    </section>
+  )
+}
 
 export function HomePage() {
   return (
@@ -21,25 +37,19 @@ export function HomePage() {
         <section key={group.size} className="size-group" aria-labelledby={`size-${group.size}`}>
           <h2 id={`size-${group.size}`}>{strings.levelHeading(group.size)}</h2>
           <ul className="puzzle-list">
-            {group.puzzles.map((entry) => {
-              const status = progressStatus(progressStore.load(entry.puzzle))
-              return (
-                <li key={entry.puzzle.id}>
-                  <a className="puzzle-link" href={routeHash({ page: 'play', size: group.size, name: entry.name })}>
-                    <span>{entry.number}</span>
-                    {status !== 'new' && (
-                      <span className={`status status-${status}`} title={strings.status[status].label}>
-                        <span aria-hidden="true">{strings.status[status].icon}</span>
-                        <span className="visually-hidden">{strings.status[status].label}</span>
-                      </span>
-                    )}
-                  </a>
-                </li>
-              )
-            })}
+            {group.puzzles.map((entry) => (
+              <li key={entry.puzzle.id}>
+                <PuzzleLink
+                  href={routeHash({ page: 'play', size: group.size, name: entry.name })}
+                  number={entry.number}
+                  puzzle={entry.puzzle}
+                />
+              </li>
+            ))}
           </ul>
         </section>
       ))}
+      <LinkedInEntry />
     </main>
   )
 }
