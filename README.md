@@ -58,16 +58,20 @@ only the Stage reached is kept, in the browser.
 ### LinkedIn Puzzles
 
 `puzzles/LinkedIn/<number>.txt` holds LinkedIn Queens puzzles under LinkedIn's own numbers, listed
-on their own page and credited there. They come from the community archive behind
-[archivedqueens.com](https://www.archivedqueens.com/); `pnpm import:linkedin` downloads it again and
-rewrites the folder, skipping the archive's few broken entries. The puzzles are LinkedIn's; this
+on their own page and credited there. They come from community archives: first
+[archivedqueens.com](https://www.archivedqueens.com/), then [awa.games](https://awa.games/linkedin-queens/)
+(also at linkedinzip.solutions), which has every puzzle from #1. `pnpm import:linkedin` downloads
+awa.games's archive and adds the numbers still missing; it never overwrites a stored puzzle, only
+reports one the archive draws differently. LinkedIn has rerun some puzzles, so a layout can appear
+under several numbers; being the same Puzzle, they share progress. The puzzles are LinkedIn's; this
 project is not affiliated with LinkedIn or Microsoft.
 
 To add the day's LinkedIn puzzle, set **存到** to **LinkedIn** in the editor, enter LinkedIn's number
 (the editor offers the one after the latest stored), paint the Regions and save; it is written to
 `puzzles/LinkedIn/<number>.txt`. Stored LinkedIn Puzzles are listed under LinkedIn in the editor's
 sidebar to correct, renumber or delete. A layout already in the library, LinkedIn or the author's
-own, is refused either way.
+own, is refused either way. LinkedIn #336, its April Fools' puzzle of 2025, is the one Puzzle whose
+Regions may be split into parts that do not touch (`linkedInRules` in `src/core/linkedInCatalog.ts`).
 
 ## Deploy
 

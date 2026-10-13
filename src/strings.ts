@@ -73,7 +73,7 @@ export const strings = {
   linkedInTitle: 'LinkedIn Queens',
   linkedInEntry: (count: number, solved: number) => `${count} 題 · 已通關 ${solved}`,
   linkedInNote:
-    '這些題目出自 LinkedIn 的每日遊戲 Queens，版權屬於 LinkedIn，經由社群整理的 archivedqueens.com 收集。本站是獨立的同好作品，與 LinkedIn、Microsoft 無關。',
+    '這些題目出自 LinkedIn 的每日遊戲 Queens，版權屬於 LinkedIn，經由社群整理的 archivedqueens.com 與 awa.games 收集。本站是獨立的同好作品，與 LinkedIn、Microsoft 無關。',
   linkedInPuzzleTitle: (number: number) => `LinkedIn #${number}`,
   backToLinkedIn: '‹ LinkedIn 題目',
 
