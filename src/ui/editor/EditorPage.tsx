@@ -38,7 +38,7 @@ export default function EditorPage(stored: EditorTarget) {
       </header>
       {isTargetGiven(stored) && !editor.opened && <p className="form-error">{text.notFound}</p>}
       <div className="editor-layout">
-        <EditorSidebar current={editor.opened} />
+        <EditorSidebar current={editor.opened} size={editor.size} collection={editor.collection} />
         <section>
           <DraftFields editor={editor} />
           <RegionPalette editor={editor} />

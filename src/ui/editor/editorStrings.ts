@@ -32,6 +32,7 @@ export const editorStrings = {
       }[problem.kind]
     }`,
   linkedInHeading: (count: number) => `LinkedIn（${count}）`,
+  levelGroup: (level: string, size: string, count: number) => `${level} ${size}（${count}）`,
   linkedInLabel: (number: number) => `LinkedIn #${number}`,
   notFound: '找不到這個題目，已改為新增題目。',
   collection: '存到',

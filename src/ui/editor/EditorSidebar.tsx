@@ -1,23 +1,34 @@
+import { levelName } from '../../core/level.ts'
 import { library, linkedInLibrary } from '../../puzzleLibrary.ts'
 import { strings } from '../../strings.ts'
-import { routeHash } from '../routes.ts'
+import { type Collection, type Route, routeHash } from '../routes.ts'
 import type { Opened } from './editorTarget.ts'
 import { editorStrings as text } from './editorStrings.ts'
 
-function LinkedInSection({ current }: { readonly current: Opened | null }) {
-  const { puzzles } = linkedInLibrary
-  if (puzzles.length === 0) return null
+interface Chip {
+  readonly key: string
+  readonly number: number
+  /** The full name, shown on hover and read out instead of the bare number. */
+  readonly label: string
+  readonly route: Route
+  readonly current: boolean
+}
+
+/** One collapsible group of Puzzles, each a small square showing only its number. */
+function ChipGroup({ title, chips, open }: { readonly title: string; readonly chips: readonly Chip[]; readonly open: boolean }) {
   return (
-    <details open={current?.kind === 'linkedIn'}>
-      <summary>{text.linkedInHeading(puzzles.length)}</summary>
-      <ul>
-        {puzzles.map((entry) => (
-          <li key={entry.puzzle.id}>
+    <details open={open}>
+      <summary>{title}</summary>
+      <ul className="editor-chips">
+        {chips.map((chip) => (
+          <li key={chip.key}>
             <a
-              href={routeHash({ page: 'editor', linkedIn: entry.number })}
-              aria-current={current?.kind === 'linkedIn' && current.number === entry.number ? 'page' : undefined}
+              href={routeHash(chip.route)}
+              title={chip.label}
+              aria-label={chip.label}
+              aria-current={chip.current ? 'page' : undefined}
             >
-              {text.linkedInLabel(entry.number)}
+              {chip.number}
             </a>
           </li>
         ))}
@@ -45,31 +56,47 @@ function Problems() {
   )
 }
 
-export function EditorSidebar({ current }: { readonly current: Opened | null }) {
+interface EditorSidebarProps {
+  /** The stored Puzzle open in the editor, if any. */
+  readonly current: Opened | null
+  /** The Draft's Size and collection: their group starts open, so its Puzzles are in view. */
+  readonly size: number
+  readonly collection: Collection
+}
+
+/** The library by Level, then the LinkedIn Puzzles, each group folded away unless it holds what is being edited. */
+export function EditorSidebar({ current, size, collection }: EditorSidebarProps) {
+  const openGroup = current?.kind === 'linkedIn' || collection === 'linkedIn' ? 'linkedIn' : (current?.puzzle.size ?? size)
   return (
     <nav className="editor-sidebar card" aria-label={text.libraryHeading}>
       <a href={routeHash({ page: 'editor' })}>{text.newPuzzle}</a>
       {library.sizes.map((group) => (
-        <section key={group.size}>
-          <h2>{strings.sizeHeading(group.size)}</h2>
-          <ul>
-            {group.puzzles.map((entry) => {
-              const isCurrent = current?.kind === 'own' && group.size === current.size && entry.name === current.name
-              return (
-                <li key={entry.puzzle.id}>
-                  <a
-                    href={routeHash({ page: 'editor', size: group.size, name: entry.name })}
-                    aria-current={isCurrent ? 'page' : undefined}
-                  >
-                    {strings.puzzleLabel(entry.number, entry.name)}
-                  </a>
-                </li>
-              )
-            })}
-          </ul>
-        </section>
+        <ChipGroup
+          key={group.size}
+          title={text.levelGroup(levelName(group.size), strings.sizeHeading(group.size), group.puzzles.length)}
+          open={openGroup === group.size}
+          chips={group.puzzles.map((entry) => ({
+            key: entry.puzzle.id,
+            number: entry.number,
+            label: entry.name,
+            route: { page: 'editor', size: group.size, name: entry.name },
+            current: current?.kind === 'own' && current.size === group.size && current.name === entry.name,
+          }))}
+        />
       ))}
-      <LinkedInSection current={current} />
+      {linkedInLibrary.puzzles.length > 0 && (
+        <ChipGroup
+          title={text.linkedInHeading(linkedInLibrary.puzzles.length)}
+          open={openGroup === 'linkedIn'}
+          chips={linkedInLibrary.puzzles.map((entry) => ({
+            key: entry.puzzle.id,
+            number: entry.number,
+            label: text.linkedInLabel(entry.number),
+            route: { page: 'editor', linkedIn: entry.number },
+            current: current?.kind === 'linkedIn' && current.number === entry.number,
+          }))}
+        />
+      )}
       <Problems />
     </nav>
   )
