@@ -88,7 +88,7 @@ test('a player who misplaces a Queen gets it pointed out, and sees Conflicts str
   await cell(page, wrong).click()
   await page.getByRole('button', { name: '提示' }).click()
 
-  await expect(page.getByText('這個皇后放錯了位置。')).toBeVisible()
+  await expect(page.getByText('這個圖案放錯了位置。')).toBeVisible()
   await expect(cell(page, wrong)).toHaveClass(/is-hinted/)
 
   // A second Queen in the same row is a Conflict: the whole row is striped and the hint goes away.
@@ -107,5 +107,5 @@ test('progress survives a reload', async ({ page }) => {
   await cell(page, coord).click()
   await page.reload()
 
-  await expect(cell(page, coord)).toHaveAttribute('aria-label', /皇后$/)
+  await expect(cell(page, coord)).toHaveAttribute('aria-label', /圖案$/)
 })

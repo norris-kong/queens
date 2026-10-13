@@ -491,7 +491,7 @@ a {
 
 .level-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 8px 12px;
   margin: 0;
   padding: 0;
@@ -524,10 +524,11 @@ a {
   outline-offset: 2px;
 }
 
+/* At least 52px a badge: six to a row on most phones, five on the narrowest, numbers still easy to read. */
 .stage-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
-  gap: 6px;
+  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+  gap: 4px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -540,11 +541,12 @@ a {
   right: 0;
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: var(--surface);
   box-shadow: 0 1px 2px rgb(0 0 0 / 25%);
+  font-size: 0.7rem;
 }
 
 .lettering {

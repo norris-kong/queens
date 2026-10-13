@@ -52,9 +52,9 @@ _Avoid_: Square, tile
 格盤上以同一顏色標示、上下左右相連的一組 Cell（只靠斜角相接不算相連）；完成時每個 Region 內恰好有一個 Queen。
 _Avoid_: Color region, area, zone, 色塊
 
-**Queen**（皇后）:
-玩家放在 Cell 上的棋子，畫面上以盤面 Size 所屬 Level 的圖示呈現（例如 Beginner 是橡實、Easy 是小鳥）。
-_Avoid_: W, crown, 皇冠
+**Queen**（圖案）:
+玩家放在 Cell 上的棋子，畫面上以盤面 Size 所屬 Level 的圖示呈現（例如 Beginner 是橡實、Easy 是小鳥），介面文字稱它為「圖案」。
+_Avoid_: W, crown, 皇冠, 皇后
 
 **Mark**（標記）:
 玩家放在 Cell 上的註記，表示「判斷這格不能放 Queen」，畫面上顯示為 X。
