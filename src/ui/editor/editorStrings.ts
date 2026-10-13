@@ -1,4 +1,5 @@
 import type { CatalogProblem } from '../../core/catalog.ts'
+import type { LinkedInProblem } from '../../core/linkedInCatalog.ts'
 import { levelName } from '../../core/level.ts'
 import { MAX_SIZE, MIN_SIZE } from '../../core/rules.ts'
 import type { EditorErrorKind } from './editorProtocol.ts'
@@ -19,7 +20,24 @@ export const editorStrings = {
         duplicate: '與其他題目重複',
       }[problem.kind]
     }`,
+  linkedInProblem: (problem: LinkedInProblem) =>
+    `LinkedIn/${problem.name}：${
+      {
+        invalidName: '檔名不是 LinkedIn 題號',
+        unreadable: '內容無法讀取',
+        notAPuzzle: '不是合格的題目',
+        duplicate: '與其他題目重複',
+      }[problem.kind]
+    }`,
+  linkedInHeading: (count: number) => `LinkedIn（${count}）`,
+  linkedInLabel: (number: number) => `LinkedIn #${number}`,
   notFound: '找不到這個題目，已改為新增題目。',
+  collection: '存到',
+  collectionOwn: '我的題目',
+  collectionLinkedIn: 'LinkedIn',
+  linkedInNumberField: 'LinkedIn 題號',
+  numberPlaceholder: '例如 523',
+  numberRule: 'LinkedIn 題號必須是 1 以上的整數，例如 523。',
   size: '尺寸',
   sizeOption: (size: number) => `${size} × ${size} · ${levelName(size)}`,
   name: '題目名稱',
@@ -50,10 +68,12 @@ export const editorStrings = {
   errors: {
     invalidName: '題目名稱不合規則。',
     invalidSize: `尺寸必須介於 ${MIN_SIZE} 到 ${MAX_SIZE}。`,
+    invalidNumber: 'LinkedIn 題號必須是 1 以上的整數。',
     unreadable: '題目內容無法讀取。',
     notAPuzzle: '這還不是合格的題目。',
     wrongSize: '題目尺寸與資料夾不符。',
     nameTaken: '這個尺寸已經有同名的題目。',
+    numberTaken: '這個 LinkedIn 題號已經有題目了。',
     duplicate: '題庫裡已經有一模一樣的題目。',
     linkedInDuplicate: '這和一題 LinkedIn 題目一模一樣。',
     notFound: '原本的題目已經不存在。',

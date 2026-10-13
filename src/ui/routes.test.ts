@@ -9,6 +9,7 @@ describe('hash routes', () => {
     { page: 'level', size: 4 },
     { page: 'play', size: 4, name: 'Beginner 1' },
     { page: 'editor', size: 12, name: 'difficulty-hard' },
+    { page: 'editor', linkedIn: 523 },
     { page: 'linkedIn' },
     { page: 'linkedInPlay', number: 250 },
     { page: 'daily' },

@@ -6,10 +6,12 @@ export const EDITOR_API_PATH = '/__editor/puzzles'
 export const EDITOR_ERROR_KINDS = [
   'invalidName',
   'invalidSize',
+  'invalidNumber',
   'unreadable',
   'notAPuzzle',
   'wrongSize',
   'nameTaken',
+  'numberTaken',
   'duplicate',
   'linkedInDuplicate',
   'notFound',

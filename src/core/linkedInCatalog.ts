@@ -25,13 +25,25 @@ export interface LinkedInCatalog {
 
 const LINKEDIN_NUMBER = /^[1-9]\d*$/
 
+/** Whether a number can be one of LinkedIn's: a whole number from 1 up. */
+export function isLinkedInNumber(number: number): boolean {
+  return Number.isSafeInteger(number) && number >= 1
+}
+
+/** A LinkedIn number written as text, as in a file name or the editor; null unless it is one. */
+export function parseLinkedInNumber(text: string): number | null {
+  const trimmed = text.trim()
+  return LINKEDIN_NUMBER.test(trimmed) && isLinkedInNumber(Number(trimmed)) ? Number(trimmed) : null
+}
+
 type Checked = { readonly ok: true; readonly entry: LinkedInEntry } | { readonly ok: false; readonly problem: LinkedInProblem }
 
 function checkFile(file: LinkedInFile): Checked {
-  if (!LINKEDIN_NUMBER.test(file.name)) return { ok: false, problem: { kind: 'invalidName', name: file.name } }
+  const number = file.name === file.name.trim() ? parseLinkedInNumber(file.name) : null
+  if (number === null) return { ok: false, problem: { kind: 'invalidName', name: file.name } }
   const read = readPuzzle(file.text)
   if (!read.ok) return { ok: false, problem: { kind: read.reason, name: file.name } }
-  return { ok: true, entry: { number: Number(file.name), puzzle: read.puzzle } }
+  return { ok: true, entry: { number, puzzle: read.puzzle } }
 }
 
 /**
@@ -54,6 +66,11 @@ export function buildLinkedInCatalog(files: readonly LinkedInFile[], takenIds: R
     puzzles.push(entry)
   }
   return { puzzles, problems }
+}
+
+/** The number after the highest one stored: where the next day's LinkedIn Puzzle usually goes. */
+export function nextLinkedInNumber(catalog: LinkedInCatalog): number {
+  return Math.max(0, ...catalog.puzzles.map((entry) => entry.number)) + 1
 }
 
 /** The LinkedIn Puzzle after this one, or null after the last. */

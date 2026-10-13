@@ -641,6 +641,13 @@ a {
   font-weight: 700;
 }
 
+.editor-sidebar summary {
+  margin: 12px 0 4px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .field-row {
   display: flex;
   flex-wrap: wrap;

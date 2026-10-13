@@ -146,3 +146,75 @@ describe('editing stored Puzzles', () => {
     expect(await repository.remove(4, 'ghost')).toEqual({ ok: false, error: { kind: 'notFound' } })
   })
 })
+
+describe('LinkedIn Puzzles', () => {
+  it('saves a LinkedIn Puzzle under its number, apart from the Size folders', async () => {
+    const result = await repository.saveLinkedIn({ number: 523, text: FOUR })
+
+    expect(result).toEqual({ ok: true })
+    expect(await repository.listLinkedIn()).toEqual([{ name: '523', text: FOUR }])
+    expect(await repository.list()).toEqual([])
+  })
+
+  it.each([
+    ['a number that is not a positive whole number', { number: 0, text: FOUR }, { kind: 'invalidNumber' }],
+    ['a fractional number', { number: 1.5, text: FOUR }, { kind: 'invalidNumber' }],
+    ['text that is not a grid', { number: 7, text: 'AB\nBAA' }, { kind: 'unreadable' }],
+    ['a Draft that is not a Puzzle', { number: 7, text: 'AAAA\nBBBB\nCCCC\nDDDD' }, { kind: 'notAPuzzle' }],
+  ])('refuses %s and writes nothing', async (_, request, error) => {
+    const result = await repository.saveLinkedIn(request)
+
+    expect(result).toMatchObject({ ok: false, error })
+    expect(await repository.listLinkedIn()).toEqual([])
+  })
+
+  it('refuses a number already used by another LinkedIn Puzzle', async () => {
+    await repository.saveLinkedIn({ number: 523, text: FOUR })
+
+    expect(await repository.saveLinkedIn({ number: 523, text: OTHER_FOUR })).toEqual({
+      ok: false,
+      error: { kind: 'numberTaken' },
+    })
+  })
+
+  it('refuses a copy of another LinkedIn Puzzle, naming its number', async () => {
+    await repository.saveLinkedIn({ number: 523, text: FOUR })
+
+    expect(await repository.saveLinkedIn({ number: 524, text: FOUR })).toEqual({
+      ok: false,
+      error: { kind: 'linkedInDuplicate', number: 523 },
+    })
+  })
+
+  it("refuses a copy of one of the author's own Puzzles", async () => {
+    await repository.save({ size: 4, name: 'Beginner 1', text: FOUR })
+
+    expect(await repository.saveLinkedIn({ number: 523, text: FOUR })).toEqual({
+      ok: false,
+      error: { kind: 'duplicate', sameAs: { size: 4, name: 'Beginner 1' } },
+    })
+  })
+
+  it('corrects a LinkedIn Puzzle in place, or moves it to the right number', async () => {
+    await repository.saveLinkedIn({ number: 523, text: FOUR })
+
+    expect(await repository.saveLinkedIn({ number: 523, previousNumber: 523, text: OTHER_FOUR })).toEqual({ ok: true })
+    expect(await repository.saveLinkedIn({ number: 532, previousNumber: 523, text: OTHER_FOUR })).toEqual({ ok: true })
+    expect(await repository.listLinkedIn()).toEqual([{ name: '532', text: OTHER_FOUR }])
+  })
+
+  it('refuses to correct a LinkedIn Puzzle that is no longer stored', async () => {
+    expect(await repository.saveLinkedIn({ number: 523, previousNumber: 523, text: FOUR })).toEqual({
+      ok: false,
+      error: { kind: 'notFound' },
+    })
+  })
+
+  it('deletes a LinkedIn Puzzle, and reports one that is not stored', async () => {
+    await repository.saveLinkedIn({ number: 523, text: FOUR })
+
+    expect(await repository.removeLinkedIn(523)).toEqual({ ok: true })
+    expect(await repository.listLinkedIn()).toEqual([])
+    expect(await repository.removeLinkedIn(523)).toEqual({ ok: false, error: { kind: 'notFound' } })
+  })
+})

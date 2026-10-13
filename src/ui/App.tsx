@@ -49,7 +49,7 @@ export function App() {
     case 'editor':
       return EditorPage ? (
         <Suspense fallback={null}>
-          <EditorPage key={routeHash(route)} size={route.size} name={route.name} />
+          <EditorPage key={routeHash(route)} size={route.size} name={route.name} linkedIn={route.linkedIn} />
         </Suspense>
       ) : (
         <NotFound />

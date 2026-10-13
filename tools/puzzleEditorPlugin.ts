@@ -15,6 +15,14 @@ const saveSchema = z.object({
 
 const removeSchema = z.object({ size: z.number().int(), name: z.string() })
 
+const linkedInSaveSchema = z.object({
+  number: z.number(),
+  text: z.string(),
+  previousNumber: z.number().optional(),
+})
+
+const linkedInRemoveSchema = z.object({ number: z.number() })
+
 class BadRequest extends Error {}
 
 async function readJson(request: IncomingMessage): Promise<unknown> {
@@ -53,10 +61,20 @@ async function handle(repository: PuzzleRepository, request: IncomingMessage): P
     if (!parsed.success) throw new BadRequest('Invalid delete request')
     return repository.remove(parsed.data.size, parsed.data.name)
   }
+  if (request.url === '/linkedin/save') {
+    const parsed = linkedInSaveSchema.safeParse(body)
+    if (!parsed.success) throw new BadRequest('Invalid LinkedIn save request')
+    return repository.saveLinkedIn(parsed.data)
+  }
+  if (request.url === '/linkedin/delete') {
+    const parsed = linkedInRemoveSchema.safeParse(body)
+    if (!parsed.success) throw new BadRequest('Invalid LinkedIn delete request')
+    return repository.removeLinkedIn(parsed.data.number)
+  }
   throw new BadRequest(`Unknown editor action ${request.url ?? ''}`)
 }
 
-/** Lets the dev-only Puzzle editor save, rename and delete files under `puzzlesDir`. */
+/** Lets the dev-only Puzzle editor save, rename and delete files under `puzzlesDir`, LinkedIn Puzzles included. */
 export function puzzleEditorPlugin(puzzlesDir: string): Plugin {
   return {
     name: 'queens-puzzle-editor',

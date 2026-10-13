@@ -1,16 +1,22 @@
 import { useMemo, useState } from 'react'
 import { DEFAULT_DRAFT_SIZE } from '../../config.ts'
-import type { FileRef } from '../../core/catalog.ts'
 import { inspectDraft } from '../../core/draft.ts'
+import { parseLinkedInNumber } from '../../core/linkedInCatalog.ts'
 import { formatPuzzle } from '../../core/puzzleFormat.ts'
-import { isValidPuzzleName, nextPuzzleName } from '../../core/puzzleName.ts'
+import { isValidPuzzleName } from '../../core/puzzleName.ts'
 import type { Coord, DraftGrid, RegionId } from '../../core/types.ts'
-import { library } from '../../puzzleLibrary.ts'
-import { findEntry } from '../libraryLookup.ts'
 import { type Route, routeHash } from '../routes.ts'
 import { editorApi } from './editorApi.ts'
 import type { EditorResult } from './editorProtocol.ts'
 import { editorStrings as text } from './editorStrings.ts'
+import {
+  type Collection,
+  type EditorTarget,
+  type Opened,
+  openTarget,
+  suggestedLinkedInNumber,
+  suggestedName,
+} from './editorTarget.ts'
 import { emptyDraft, hasAssignedCells, paint } from './draftPainting.ts'
 import { useAutoGenerate } from './useAutoGenerate.ts'
 
@@ -27,25 +33,28 @@ function errorText(result: EditorResult): string | null {
   return number === undefined ? text.errors[kind] : text.errors[kind] + text.linkedInNumber(number)
 }
 
-/** The name a new Puzzle of this Size is offered, following the ones already in the library. */
-function suggestedName(size: number): string {
-  const taken = library.sizes.find((group) => group.size === size)?.puzzles.map((entry) => entry.name) ?? []
-  return nextPuzzleName(size, taken)
+function openedLabel(opened: Opened): string {
+  return opened.kind === 'own' ? opened.name : text.linkedInLabel(opened.number)
 }
 
 /** The Draft being edited, opened from `stored` when given, plus the editor's actions on it. */
-export function useDraftEditor(stored: Partial<FileRef>) {
-  const located = stored.size !== undefined && stored.name !== undefined ? findEntry(library, stored.size, stored.name) : null
-  const [size, setSize] = useState(located?.size ?? DEFAULT_DRAFT_SIZE)
-  const [draft, setDraft] = useState<DraftGrid>(located?.entry.puzzle.regions ?? emptyDraft(size))
-  const [name, setName] = useState(located?.entry.name ?? suggestedName(size))
+export function useDraftEditor(stored: EditorTarget) {
+  const opened = openTarget(stored)
+  const [collection, setCollection] = useState<Collection>(stored.linkedIn === undefined ? 'own' : 'linkedIn')
+  const [size, setSize] = useState(opened?.puzzle.size ?? DEFAULT_DRAFT_SIZE)
+  const [draft, setDraft] = useState<DraftGrid>(opened?.puzzle.regions ?? emptyDraft(size))
+  const [name, setName] = useState(opened?.kind === 'own' ? opened.name : suggestedName(size))
+  const [numberText, setNumberText] = useState(String(opened?.kind === 'linkedIn' ? opened.number : suggestedLinkedInNumber()))
   const [brush, setBrush] = useState<RegionId | null>(0)
   const [stroke, setStroke] = useState<readonly Coord[] | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inspection = useMemo(() => inspectDraft(draft), [draft])
-  const savedName = name.trim()
   const auto = useAutoGenerate(size, draft, (regions) => setDraft(regions))
+  const savedName = name.trim()
+  const linkedInNumber = parseLinkedInNumber(numberText)
+  const nameValid = isValidPuzzleName(savedName)
+  const numberValid = linkedInNumber !== null
 
   async function run(request: () => Promise<EditorResult>, after: Route) {
     setBusy(true)
@@ -56,15 +65,26 @@ export function useDraftEditor(stored: Partial<FileRef>) {
     else setError(errorText(result))
   }
 
+  function saveLinkedIn(number: number, puzzleText: string) {
+    const previousNumber = opened?.kind === 'linkedIn' ? opened.number : undefined
+    void run(() => editorApi.saveLinkedIn({ number, text: puzzleText, previousNumber }), { page: 'editor', linkedIn: number })
+  }
+
+  function saveOwn(puzzleText: string) {
+    const previousName = opened?.kind === 'own' ? opened.name : undefined
+    void run(() => editorApi.save({ size, name: savedName, text: puzzleText, previousName }), { page: 'editor', size, name: savedName })
+  }
+
   return {
-    located, size, name, brush, inspection,
+    opened, collection, size, name, numberText, brush, inspection, nameValid, numberValid,
     busy: busy || auto.generating,
     generating: auto.generating,
     generate: auto.generate,
     error: error ?? auto.generateError,
     shownDraft: stroke ? paint(draft, stroke, brush) : draft,
-    nameValid: isValidPuzzleName(savedName),
-    setName, setBrush, previewPaint: setStroke,
+    /** Whether the name or LinkedIn number the Draft would be saved under is acceptable. */
+    targetValid: collection === 'own' ? nameValid : numberValid,
+    setCollection, setName, setNumberText, setBrush, previewPaint: setStroke,
     commitPaint(cells: readonly Coord[]) {
       setStroke(null)
       setDraft((current) => paint(current, cells, brush))
@@ -77,13 +97,16 @@ export function useDraftEditor(stored: Partial<FileRef>) {
       setBrush(0)
     },
     save() {
-      if (!inspection.valid || !isValidPuzzleName(savedName)) return
-      const request = { size, name: savedName, text: formatPuzzle(draft), previousName: located?.entry.name }
-      void run(() => editorApi.save(request), { page: 'editor', size, name: savedName })
+      if (!inspection.valid) return
+      const puzzleText = formatPuzzle(draft)
+      if (collection === 'linkedIn' && linkedInNumber !== null) saveLinkedIn(linkedInNumber, puzzleText)
+      else if (collection === 'own' && nameValid) saveOwn(puzzleText)
     },
     remove() {
-      if (!located || !window.confirm(text.confirmDelete(located.entry.name))) return
-      void run(() => editorApi.remove(located.size, located.entry.name), { page: 'editor' })
+      if (!opened || !window.confirm(text.confirmDelete(openedLabel(opened)))) return
+      const request = () =>
+        opened.kind === 'own' ? editorApi.remove(opened.size, opened.name) : editorApi.removeLinkedIn(opened.number)
+      void run(request, { page: 'editor' })
     },
   }
 }

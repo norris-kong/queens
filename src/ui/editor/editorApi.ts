@@ -7,7 +7,15 @@ export interface SaveRequest {
   readonly previousName?: string
 }
 
-async function post(action: 'save' | 'delete', body: unknown): Promise<EditorResult> {
+export interface LinkedInSaveRequest {
+  readonly number: number
+  readonly text: string
+  readonly previousNumber?: number
+}
+
+type Action = 'save' | 'delete' | 'linkedin/save' | 'linkedin/delete'
+
+async function post(action: Action, body: unknown): Promise<EditorResult> {
   let response: Response
   try {
     response = await fetch(`${EDITOR_API_PATH}/${action}`, {
@@ -29,4 +37,6 @@ async function post(action: 'save' | 'delete', body: unknown): Promise<EditorRes
 export const editorApi = {
   save: (request: SaveRequest) => post('save', request),
   remove: (size: number, name: string) => post('delete', { size, name }),
+  saveLinkedIn: (request: LinkedInSaveRequest) => post('linkedin/save', request),
+  removeLinkedIn: (number: number) => post('linkedin/delete', { number }),
 }

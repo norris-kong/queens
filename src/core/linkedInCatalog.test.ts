@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildLinkedInCatalog, nextLinkedIn } from './linkedInCatalog.ts'
+import { buildLinkedInCatalog, isLinkedInNumber, nextLinkedIn, nextLinkedInNumber, parseLinkedInNumber } from './linkedInCatalog.ts'
 import { FOUR_BY_FOUR } from './testing.ts'
 
 const FOUR = 'CABB\nCCBB\nCCDD\nDDDD\n'
@@ -74,5 +74,46 @@ describe('nextLinkedIn', () => {
 
   it('has nothing after the last', () => {
     expect(nextLinkedIn(catalog, 8)).toBeNull()
+  })
+})
+
+describe('isLinkedInNumber', () => {
+  it.each([1, 523, 9000])('accepts %i', (number) => {
+    expect(isLinkedInNumber(number)).toBe(true)
+  })
+
+  it.each([0, -3, 1.5, Number.NaN])('refuses %d', (number) => {
+    expect(isLinkedInNumber(number)).toBe(false)
+  })
+})
+
+describe('parseLinkedInNumber', () => {
+  it.each([
+    ['523', 523],
+    [' 523 ', 523],
+    ['0', null],
+    ['007', null],
+    ['52a', null],
+    ['', null],
+  ])('reads %j as %j', (text, number) => {
+    expect(parseLinkedInNumber(text)).toBe(number)
+  })
+})
+
+describe('nextLinkedInNumber', () => {
+  it('follows the highest number stored', () => {
+    const catalog = buildLinkedInCatalog(
+      [
+        { name: '3', text: FOUR },
+        { name: '8', text: OTHER_FOUR },
+      ],
+      new Set(),
+    )
+
+    expect(nextLinkedInNumber(catalog)).toBe(9)
+  })
+
+  it('starts at 1 with none stored', () => {
+    expect(nextLinkedInNumber(buildLinkedInCatalog([], new Set()))).toBe(1)
   })
 })

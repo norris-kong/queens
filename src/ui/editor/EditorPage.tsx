@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import type { FileRef } from '../../core/catalog.ts'
 import { strings } from '../../strings.ts'
 import { PlayScreen } from '../PlayScreen.tsx'
 import { routeHash } from '../routes.ts'
@@ -7,10 +6,11 @@ import { DraftBoard } from './DraftBoard.tsx'
 import { DraftReport } from './DraftReport.tsx'
 import { DraftFields, EditorActions, RegionPalette } from './EditorControls.tsx'
 import { EditorSidebar } from './EditorSidebar.tsx'
+import { type EditorTarget, isTargetGiven } from './editorTarget.ts'
 import { editorStrings as text } from './editorStrings.ts'
 import { useDraftEditor } from './useDraftEditor.ts'
 
-export default function EditorPage(stored: Partial<FileRef>) {
+export default function EditorPage(stored: EditorTarget) {
   const editor = useDraftEditor(stored)
   const [playtesting, setPlaytesting] = useState(false)
 
@@ -36,9 +36,9 @@ export default function EditorPage(stored: Partial<FileRef>) {
         </a>
         <h1>{text.title}</h1>
       </header>
-      {stored.name !== undefined && !editor.located && <p className="form-error">{text.notFound}</p>}
+      {isTargetGiven(stored) && !editor.opened && <p className="form-error">{text.notFound}</p>}
       <div className="editor-layout">
-        <EditorSidebar current={editor.located ? { size: editor.located.size, name: editor.located.entry.name } : null} />
+        <EditorSidebar current={editor.opened} />
         <section>
           <DraftFields editor={editor} />
           <RegionPalette editor={editor} />

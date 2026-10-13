@@ -59,8 +59,13 @@ only the Stage reached is kept, in the browser.
 on their own page and credited there. They come from the community archive behind
 [archivedqueens.com](https://www.archivedqueens.com/); `pnpm import:linkedin` downloads it again and
 rewrites the folder, skipping the archive's few broken entries. The puzzles are LinkedIn's; this
-project is not affiliated with LinkedIn or Microsoft. The editor never shows them, and refuses to
-save a copy of one.
+project is not affiliated with LinkedIn or Microsoft.
+
+To add the day's LinkedIn puzzle, set **存到** to **LinkedIn** in the editor, enter LinkedIn's number
+(the editor offers the one after the latest stored), paint the Regions and save; it is written to
+`puzzles/LinkedIn/<number>.txt`. Stored LinkedIn Puzzles are listed under LinkedIn in the editor's
+sidebar to correct, renumber or delete. A layout already in the library, LinkedIn or the author's
+own, is refused either way.
 
 ## Deploy
 
