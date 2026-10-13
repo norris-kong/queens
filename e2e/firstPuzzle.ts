@@ -11,6 +11,8 @@ export interface FirstPuzzle {
   readonly path: string
   /** The page of its Level, listing it. */
   readonly levelPath: string
+  /** Where the editor opens it. */
+  readonly editorPath: string
   readonly puzzle: Puzzle
   readonly solution: readonly Coord[]
   /** A Cell outside the Solution, for placing a wrong Queen. */
@@ -28,6 +30,7 @@ export async function firstPuzzle(): Promise<FirstPuzzle> {
   return {
     path: routeHash({ page: 'play', size: group.size, name: entry.name }),
     levelPath: routeHash({ page: 'level', size: group.size }),
+    editorPath: routeHash({ page: 'editor', size: group.size, name: entry.name }),
     puzzle: entry.puzzle,
     solution,
     wrongCell: { row: 0, col: firstCol === 0 ? 1 : 0 },

@@ -8,6 +8,8 @@ import type { EditorErrorKind } from './editorProtocol.ts'
 export const editorStrings = {
   title: '題目編輯器',
   newPuzzle: '＋ 新增題目',
+  createNext: '＋ 新增下一題',
+  confirmDiscard: '這一題的修改還沒儲存，確定要放棄並新增下一題嗎？',
   libraryHeading: '題庫',
   libraryProblems: '有問題的檔案（未載入遊戲）',
   libraryProblem: (problem: CatalogProblem) =>

@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react'
-import { DEFAULT_DRAFT_SIZE } from '../../config.ts'
 import { inspectDraft } from '../../core/draft.ts'
 import { parseLinkedInNumber } from '../../core/linkedInCatalog.ts'
 import { formatPuzzle } from '../../core/puzzleFormat.ts'
 import { isValidPuzzleName } from '../../core/puzzleName.ts'
 import type { Coord, DraftGrid, RegionId } from '../../core/types.ts'
 import { type Route, routeHash } from '../routes.ts'
+import { navigate } from '../useHashRoute.ts'
 import { editorApi } from './editorApi.ts'
 import type { EditorResult } from './editorProtocol.ts'
 import { editorStrings as text } from './editorStrings.ts'
@@ -14,6 +14,8 @@ import {
   type EditorTarget,
   type Opened,
   openTarget,
+  startingCollection,
+  startingSize,
   suggestedLinkedInNumber,
   suggestedName,
 } from './editorTarget.ts'
@@ -40,8 +42,8 @@ function openedLabel(opened: Opened): string {
 /** The Draft being edited, opened from `stored` when given, plus the editor's actions on it. */
 export function useDraftEditor(stored: EditorTarget) {
   const opened = openTarget(stored)
-  const [collection, setCollection] = useState<Collection>(stored.linkedIn === undefined ? 'own' : 'linkedIn')
-  const [size, setSize] = useState(opened?.puzzle.size ?? DEFAULT_DRAFT_SIZE)
+  const [collection, setCollection] = useState<Collection>(() => startingCollection(stored, opened))
+  const [size, setSize] = useState(() => startingSize(stored, opened))
   const [draft, setDraft] = useState<DraftGrid>(opened?.puzzle.regions ?? emptyDraft(size))
   const [name, setName] = useState(opened?.kind === 'own' ? opened.name : suggestedName(size))
   const [numberText, setNumberText] = useState(String(opened?.kind === 'linkedIn' ? opened.number : suggestedLinkedInNumber()))
@@ -101,6 +103,11 @@ export function useDraftEditor(stored: EditorTarget) {
       const puzzleText = formatPuzzle(draft)
       if (collection === 'linkedIn' && linkedInNumber !== null) saveLinkedIn(linkedInNumber, puzzleText)
       else if (collection === 'own' && nameValid) saveOwn(puzzleText)
+    },
+    /** Leaves the stored Puzzle for a new Draft of the same Size and collection, to make the next one. */
+    createNext() {
+      if (opened && draft !== opened.puzzle.regions && !window.confirm(text.confirmDiscard)) return
+      navigate({ page: 'editor', size, collection })
     },
     remove() {
       if (!opened || !window.confirm(text.confirmDelete(openedLabel(opened)))) return

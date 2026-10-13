@@ -75,10 +75,17 @@ export function DraftFields({ editor }: { readonly editor: DraftEditor }) {
             ))}
           </select>
         </label>
-        {own && (
-          <button type="button" className="button" disabled={editor.busy} onClick={editor.generate}>
-            {editor.generating ? text.generating : text.generate}
+        {editor.opened ? (
+          // A stored Puzzle keeps its Size and is never generated over; the next one starts afresh.
+          <button type="button" className="button" disabled={editor.busy} onClick={editor.createNext}>
+            {text.createNext}
           </button>
+        ) : (
+          own && (
+            <button type="button" className="button" disabled={editor.busy} onClick={editor.generate}>
+              {editor.generating ? text.generating : text.generate}
+            </button>
+          )
         )}
         {own ? <NameField editor={editor} /> : <LinkedInNumberField editor={editor} />}
       </div>

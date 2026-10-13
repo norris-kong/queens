@@ -28,7 +28,9 @@ Make and edit Puzzles in the editor at `#/editor`, which only exists under `pnpm
 Draft as you paint, shows two diverging Solutions when there is more than one, and writes the file
 when you save. **自動出題** fills the Draft with a generated Puzzle of the chosen Size (evenly sized
 Regions, exactly one Solution) that you can adjust and save. A new Puzzle is named after its Level
-and the next number, e.g. `Beginner 11`; you can still type another name.
+and the next number, e.g. `Beginner 11`; you can still type another name. Once saved, a Puzzle opens
+for corrections and is never generated over: **＋ 新增下一題** starts the next one at the same Size,
+ready for another **自動出題**.
 
 ### Level art
 

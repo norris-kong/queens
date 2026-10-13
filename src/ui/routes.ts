@@ -1,9 +1,19 @@
+/** Where the editor saves a Puzzle: among the author's own, or among the LinkedIn Puzzles. */
+export type Collection = 'own' | 'linkedIn'
+
 export type Route =
   | { readonly page: 'home' }
   | { readonly page: 'rules' }
   | { readonly page: 'level'; readonly size: number }
   | { readonly page: 'play'; readonly size: number; readonly name: string }
-  | { readonly page: 'editor'; readonly size?: number; readonly name?: string; readonly linkedIn?: number }
+  | {
+      readonly page: 'editor'
+      readonly size?: number
+      readonly name?: string
+      readonly linkedIn?: number
+      /** For a new Draft (a Size but no name): where it will be saved. */
+      readonly collection?: Collection
+    }
   | { readonly page: 'linkedIn' }
   | { readonly page: 'linkedInPlay'; readonly number: number }
   | { readonly page: 'daily' }
@@ -15,6 +25,7 @@ const PUZZLE_PATH = /^\/(play|editor)\/(\d+)\/([^/]+)$/
 const LEVEL_PATH = /^\/level\/(\d+)$/
 const LINKEDIN_PATH = /^\/linkedin\/([1-9]\d*)$/
 const EDITOR_LINKEDIN_PATH = /^\/editor\/linkedin\/([1-9]\d*)$/
+const EDITOR_NEW_PATH = /^\/editor\/new\/(\d+)(\/linkedin)?$/
 const DAILY_PATH = /^\/daily\/(\d{4}-\d{2}-\d{2})$/
 
 function decodeName(escaped: string): string | null {
@@ -33,6 +44,11 @@ export function parseRoute(hash: string): Route {
   if (path === '/editor') return { page: 'editor' }
   const editorLinkedIn = EDITOR_LINKEDIN_PATH.exec(path)
   if (editorLinkedIn) return { page: 'editor', linkedIn: Number(editorLinkedIn[1]) }
+  const editorNew = EDITOR_NEW_PATH.exec(path)
+  if (editorNew) {
+    const size = Number(editorNew[1])
+    return editorNew[2] ? { page: 'editor', size, collection: 'linkedIn' } : { page: 'editor', size }
+  }
   const level = LEVEL_PATH.exec(path)
   if (level) return { page: 'level', size: Number(level[1]) }
   if (path === '/linkedin') return { page: 'linkedIn' }
@@ -61,9 +77,9 @@ export function routeHash(route: Route): string {
       return `#/play/${route.size}/${encodeURIComponent(route.name)}`
     case 'editor':
       if (route.linkedIn !== undefined) return `#/editor/linkedin/${route.linkedIn}`
-      return route.size === undefined || route.name === undefined
-        ? '#/editor'
-        : `#/editor/${route.size}/${encodeURIComponent(route.name)}`
+      if (route.size === undefined) return '#/editor'
+      if (route.name !== undefined) return `#/editor/${route.size}/${encodeURIComponent(route.name)}`
+      return `#/editor/new/${route.size}${route.collection === 'linkedIn' ? '/linkedin' : ''}`
     case 'linkedIn':
       return '#/linkedin'
     case 'linkedInPlay':

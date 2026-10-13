@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { nextLinkedInNumber } from '../src/core/linkedInCatalog.ts'
-import { linkedInPuzzles } from './firstPuzzle.ts'
+import { firstPuzzle, linkedInPuzzles } from './firstPuzzle.ts'
 
 // These flows never press 儲存, so they leave the puzzles/ folder untouched.
 
@@ -65,4 +65,43 @@ test('a stored LinkedIn Puzzle opens from the sidebar, ready to correct or delet
   await expect(page.getByLabel('存到')).toBeDisabled()
   await expect(page.getByText('✓ 唯一解，可以儲存。')).toBeVisible()
   await expect(page.getByRole('button', { name: '刪除' })).toBeVisible()
+})
+
+test('a stored Puzzle is never generated over; 新增下一題 starts the next one at the same Size', async ({ page }) => {
+  const first = await firstPuzzle()
+  await page.goto(first.editorPath)
+
+  await expect(page.getByRole('button', { name: '自動出題' })).toHaveCount(0)
+  await expect(page.getByLabel('尺寸')).toBeDisabled()
+  await page.getByRole('button', { name: '＋ 新增下一題' }).click()
+
+  await expect(page.getByLabel('尺寸')).toBeEnabled()
+  await expect(page.getByLabel('尺寸')).toHaveValue(String(first.puzzle.size))
+  await expect(page.getByLabel('題目名稱')).toHaveValue(/^Beginner \d+$/)
+  await expect(page.getByRole('button', { name: '自動出題' })).toBeVisible()
+})
+
+test('新增下一題 asks before dropping unsaved changes to a stored Puzzle', async ({ page }) => {
+  const first = await firstPuzzle()
+  await page.goto(first.editorPath)
+  await page.locator('[data-row="0"][data-col="0"]').click()
+  page.once('dialog', (dialog) => void dialog.dismiss())
+
+  await page.getByRole('button', { name: '＋ 新增下一題' }).click()
+
+  await expect(page.getByLabel('尺寸')).toBeDisabled()
+})
+
+test('新增下一題 after a LinkedIn Puzzle offers the next LinkedIn number', async ({ page }) => {
+  const catalog = await linkedInPuzzles()
+  const last = catalog.puzzles.at(-1)
+  if (!last) throw new Error('E2E needs at least one LinkedIn Puzzle')
+  await page.goto(`#/editor/linkedin/${last.number}`)
+
+  await page.getByRole('button', { name: '＋ 新增下一題' }).click()
+
+  await expect(page.getByLabel('存到')).toHaveValue('linkedIn')
+  await expect(page.getByLabel('存到')).toBeEnabled()
+  await expect(page.getByLabel('LinkedIn 題號')).toHaveValue(String(nextLinkedInNumber(catalog)))
+  await expect(page.getByLabel('尺寸')).toHaveValue(String(last.puzzle.size))
 })
