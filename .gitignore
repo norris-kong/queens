@@ -31,3 +31,6 @@ blob-report
 
 # Reference screenshots (LinkedIn Queens); kept locally, never committed
 rule/
+
+# Python environment for tools/mergeFontOverlaps.py
+.venv-font

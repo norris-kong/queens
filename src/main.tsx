@@ -1,4 +1,3 @@
-import '@fontsource/cherry-bomb-one/latin-400.css'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { library, linkedInLibrary } from './puzzleLibrary.ts'

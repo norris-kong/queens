@@ -1,5 +1,6 @@
+import type { CSSProperties } from 'react'
 import type { LevelInk } from './levelArt.ts'
-import { AVERAGE_ADVANCE, CAP_HEIGHT, DESCENDER, OUTLINE } from './letteringMetrics.ts'
+import { CAP_HEIGHT, OUTLINE } from './letteringMetrics.ts'
 
 interface LetteringProps {
   readonly text: string
@@ -10,7 +11,11 @@ interface LetteringProps {
   readonly ink: LevelInk
 }
 
-/** Level lettering inside an SVG: Cherry Bomb One in the Level's colours with a thick outline, centred on (x, y). */
+/**
+ * Level lettering inside an SVG: Cherry Bomb One in the Level's colours, centred on (x, y). The
+ * outline straddles each letter's edge, so the small holes in letters like e and 8 stay open with
+ * an outline as thick as the one outside; the font's merged glyphs keep it from tracing seams.
+ */
 export function Lettering({ text, x, y, fontSize, ink }: LetteringProps) {
   return (
     <text
@@ -23,24 +28,21 @@ export function Lettering({ text, x, y, fontSize, ink }: LetteringProps) {
       stroke={ink.outline}
       strokeWidth={fontSize * OUTLINE}
       strokeLinejoin="round"
-      paintOrder="stroke"
     >
       {text}
     </text>
   )
 }
 
-/** Level lettering on its own, e.g. as a page title, sized to fit the text. */
+/**
+ * Level lettering as ordinary text, e.g. a page title. Unlike lettering in an SVG, it takes exactly
+ * the width its letters need, so nothing is cut off whatever the word.
+ */
 export function LetteringTitle({ text, ink }: { readonly text: string; readonly ink: LevelInk }) {
-  const fontSize = 100
-  const margin = (OUTLINE / 2) * fontSize
-  const width = text.length * AVERAGE_ADVANCE * fontSize + 2 * margin
-  const height = (CAP_HEIGHT + DESCENDER) * fontSize + 2 * margin
-  // Centre the capitals, leaving room below them for descenders.
-  const capsMiddle = margin + (CAP_HEIGHT / 2) * fontSize
+  const colours = { '--ink-fill': ink.fill, '--ink-outline': ink.outline, '--ink-outline-width': `${OUTLINE}em` }
   return (
-    <svg className="lettering-title" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={text}>
-      <Lettering text={text} x={width / 2} y={capsMiddle} fontSize={fontSize} ink={ink} />
-    </svg>
+    <span className="lettering lettering-title" style={colours as CSSProperties}>
+      {text}
+    </span>
   )
 }
