@@ -23,7 +23,12 @@ export default function EditorPage(stored: EditorTarget) {
           </button>
           <h1>{text.playtest}</h1>
         </header>
-        <PlayScreen key={editor.inspection.puzzle.id} puzzle={editor.inspection.puzzle} slot={null} />
+        <PlayScreen
+          key={editor.inspection.puzzle.id}
+          puzzle={editor.inspection.puzzle}
+          slot={null}
+          queenLook={editor.collection === 'linkedIn' ? 'linkedIn' : 'level'}
+        />
       </main>
     )
   }

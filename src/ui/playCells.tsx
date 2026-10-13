@@ -6,7 +6,7 @@ import type { CSSProperties } from 'react'
 import type { Coord, Puzzle } from '../core/types.ts'
 import { strings } from '../strings.ts'
 import type { CellView } from './BoardView.tsx'
-import { MarkIcon, QueenMark } from './icons.tsx'
+import { MarkIcon, QueenMark, type QueenLook } from './icons.tsx'
 
 /** On a Solve, the Queens grow and settle back one row after another, this far apart. */
 const CELEBRATION_STAGGER_MS = 70
@@ -24,23 +24,38 @@ export function highlightsFor(puzzle: Puzzle, board: Board): Highlights {
   }
 }
 
-function cellContent(state: CellState | undefined, queenClass: string, size: number, row: number) {
+interface QueenDrawing {
+  readonly className: string
+  readonly size: number
+  readonly row: number
+  readonly look: QueenLook
+  readonly solved: boolean
+}
+
+function cellContent(state: CellState | undefined, queen: QueenDrawing) {
   if (state === 'queen') {
-    const delay = { '--celebration-delay': `${row * CELEBRATION_STAGGER_MS}ms` } as CSSProperties
-    return <QueenMark size={size} className={queenClass} style={delay} />
+    const delay = { '--celebration-delay': `${queen.row * CELEBRATION_STAGGER_MS}ms` } as CSSProperties
+    return <QueenMark size={queen.size} look={queen.look} solved={queen.solved} className={queen.className} style={delay} />
   }
   if (state === 'mark') return <MarkIcon />
   return null
 }
 
-export function cellView(board: Board, highlights: Highlights, hint: Hint | null, solved: boolean, cell: Coord): CellView {
+export function cellView(
+  board: Board,
+  highlights: Highlights,
+  hint: Hint | null,
+  solved: boolean,
+  cell: Coord,
+  look: QueenLook = 'level',
+): CellView {
   const state = board[cell.row]?.[cell.col]
   const id = key(cell)
   const queenClass = solved ? 'is-solved' : highlights.conflictingQueens.has(id) ? 'is-conflict' : ''
   const hinted = hint !== null && key(hint.cell) === id
   return {
     label: strings.cellLabel(cell.row, cell.col, strings.cellStates[state ?? 'empty']),
-    content: cellContent(state, queenClass, board.length, cell.row),
+    content: cellContent(state, { className: queenClass, size: board.length, row: cell.row, look, solved }),
     className: [highlights.striped.has(id) ? 'is-striped' : '', hinted ? 'is-hinted' : ''].join(' '),
   }
 }

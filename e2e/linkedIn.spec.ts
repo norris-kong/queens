@@ -23,7 +23,10 @@ test("a player finds LinkedIn's Puzzles apart from the others, credited, and pla
     const cell = page.locator(`[data-row="${row}"][data-col="${col}"]`)
     await cell.click()
     await cell.click()
+    // LinkedIn's Queens wear LinkedIn's crown, not a Level logo.
+    if (row === 0) await expect(cell.locator('svg.crown')).toBeVisible()
   }
+  await expect(page.locator('img.queen.is-solved[src*="crown-solved"]')).toHaveCount(first.puzzle.size)
   await page.getByRole('button', { name: '下一題' }).click()
 
   await expect(page.getByRole('heading', { name: `LinkedIn #${second.number}` })).toBeVisible()

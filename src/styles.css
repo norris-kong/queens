@@ -19,6 +19,7 @@
   --grid-line: #1f1f1f;
   --cell-line: rgb(31 31 31 / 35%);
   --mark: #2b2b2b;
+  --queen: #1f1f1f;
   --queen-conflict: #c81e1e;
   --conflict-stripe: rgb(200 30 30 / 75%);
   --hint: #3b5bdb;
@@ -302,6 +303,18 @@ a {
 /* The logos cannot change colour, so a Queen in a Conflict gets a red halo instead. */
 .cell-icon.queen.is-conflict {
   filter: drop-shadow(0 0 1.5px var(--queen-conflict)) drop-shadow(0 0 1.5px var(--queen-conflict));
+}
+
+/* LinkedIn's crown is drawn in one colour, so it simply turns red in a Conflict. */
+.cell-icon.queen.crown {
+  width: 70%;
+  height: 70%;
+  color: var(--queen);
+}
+
+.cell-icon.queen.crown.is-conflict {
+  color: var(--queen-conflict);
+  filter: none;
 }
 
 /* Solved: each Queen grows and settles back, row after row. */

@@ -3,6 +3,7 @@ import { formatSolveTime } from '../core/solveTime.ts'
 import type { Puzzle } from '../core/types.ts'
 import { strings } from '../strings.ts'
 import { BoardView } from './BoardView.tsx'
+import type { QueenLook } from './icons.tsx'
 import { cellView, highlightsFor } from './playCells.tsx'
 import { usePlaySession } from './usePlaySession.ts'
 
@@ -25,6 +26,8 @@ interface PlayScreenProps {
   readonly onSolve?: () => void
   /** Offer "重玩" once Solved; off where players only move forward, as in Nightmare. */
   readonly canReplay?: boolean
+  /** How Queens are drawn; LinkedIn Puzzles wear LinkedIn's crown. */
+  readonly queenLook?: QueenLook
 }
 
 function SolvedPanel({ session, next, solvedNote, canReplay = true }: { readonly session: Session } & Pick<PlayScreenProps, 'next' | 'solvedNote' | 'canReplay'>) {
@@ -70,7 +73,7 @@ function PlayControls({ session }: { readonly session: Session }) {
   )
 }
 
-export function PlayScreen({ puzzle, slot, next, solvedNote, onSolve, canReplay }: PlayScreenProps) {
+export function PlayScreen({ puzzle, slot, next, solvedNote, onSolve, canReplay, queenLook }: PlayScreenProps) {
   const session = usePlaySession(puzzle, slot, onSolve)
   const highlights = highlightsFor(puzzle, session.board)
 
@@ -80,7 +83,7 @@ export function PlayScreen({ puzzle, slot, next, solvedNote, onSolve, canReplay 
         regions={puzzle.regions}
         label={strings.boardLabel}
         disabled={session.solved}
-        renderCell={(cell) => cellView(session.board, highlights, session.hint, session.solved, cell)}
+        renderCell={(cell) => cellView(session.board, highlights, session.hint, session.solved, cell, queenLook)}
         onTap={session.tap}
         onPreview={session.previewDrag}
         onCommit={session.commitDrag}

@@ -3,13 +3,14 @@ import { regionLetter } from '../../core/puzzleFormat.ts'
 import type { Coord, RegionId } from '../../core/types.ts'
 import { strings } from '../../strings.ts'
 import { BoardView, type CellView } from '../BoardView.tsx'
-import { QueenMark } from '../icons.tsx'
+import { QueenMark, type QueenLook } from '../icons.tsx'
 import type { DraftEditor } from './useDraftEditor.ts'
 
 /** Overlays that help the author: the Solution when unique, two diverging Solutions when not. */
-function solutionOverlay(inspection: DraftInspection, cell: Coord): CellView['content'] {
+function solutionOverlay(inspection: DraftInspection, cell: Coord, look: QueenLook): CellView['content'] {
   if (inspection.valid) {
-    return inspection.puzzle.solution[cell.row] === cell.col ? <QueenMark size={inspection.puzzle.size} className="is-faint" /> : null
+    const isQueen = inspection.puzzle.solution[cell.row] === cell.col
+    return isQueen ? <QueenMark size={inspection.puzzle.size} look={look} className="is-faint" /> : null
   }
   const multiple = inspection.problems.find((problem) => problem.kind === 'multipleSolutions')
   if (!multiple) return null
@@ -29,7 +30,7 @@ export function DraftBoard({ editor }: { readonly editor: DraftEditor }) {
     const region = editor.shownDraft[cell.row]?.[cell.col] ?? null
     return {
       label: strings.cellLabel(cell.row, cell.col, region === null ? strings.cellStates.empty : regionLetter(region)),
-      content: solutionOverlay(editor.inspection, cell),
+      content: solutionOverlay(editor.inspection, cell, editor.collection === 'linkedIn' ? 'linkedIn' : 'level'),
       className: region !== null && disconnected.has(region) ? 'is-striped' : '',
     }
   }
