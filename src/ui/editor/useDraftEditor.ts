@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { inspectDraft } from '../../core/draft.ts'
-import { parseLinkedInNumber } from '../../core/linkedInCatalog.ts'
+import { linkedInRules, parseLinkedInNumber } from '../../core/linkedInCatalog.ts'
 import { formatPuzzle } from '../../core/puzzleFormat.ts'
 import { isValidPuzzleName } from '../../core/puzzleName.ts'
 import type { Coord, DraftGrid, RegionId } from '../../core/types.ts'
@@ -51,10 +51,15 @@ export function useDraftEditor(stored: EditorTarget) {
   const [stroke, setStroke] = useState<readonly Coord[] | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const inspection = useMemo(() => inspectDraft(draft), [draft])
   const auto = useAutoGenerate(size, draft, (regions) => setDraft(regions))
   const savedName = name.trim()
   const linkedInNumber = parseLinkedInNumber(numberText)
+  // A LinkedIn Draft is held to that LinkedIn Puzzle's own rules, such as #336's split Regions.
+  const rulesNumber = collection === 'linkedIn' ? linkedInNumber : null
+  const inspection = useMemo(
+    () => inspectDraft(draft, rulesNumber === null ? {} : linkedInRules(rulesNumber)),
+    [draft, rulesNumber],
+  )
   const nameValid = isValidPuzzleName(savedName)
   const numberValid = linkedInNumber !== null
 

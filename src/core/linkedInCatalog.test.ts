@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { buildLinkedInCatalog, isLinkedInNumber, nextLinkedIn, nextLinkedInNumber, parseLinkedInNumber } from './linkedInCatalog.ts'
-import { FOUR_BY_FOUR } from './testing.ts'
+import { FOUR_BY_FOUR, LINKEDIN_336 } from './testing.ts'
 
 const FOUR = 'CABB\nCCBB\nCCDD\nDDDD\n'
 const OTHER_FOUR = 'AAAB\nCCBB\nCCCB\nCCDD\n'
@@ -41,21 +41,44 @@ describe('buildLinkedInCatalog', () => {
     ])
   })
 
-  it("leaves out a layout already among the author's Puzzles or an earlier LinkedIn Puzzle", () => {
+  it("keeps #336, LinkedIn's April Fools' puzzle, whose Regions are split on purpose, and no other such layout", () => {
+    const catalog = buildLinkedInCatalog(
+      [
+        { name: '336', text: LINKEDIN_336 },
+        { name: '337', text: LINKEDIN_336 },
+      ],
+      new Set(),
+    )
+
+    expect(catalog.puzzles.map((entry) => entry.number)).toEqual([336])
+    expect(catalog.problems).toEqual([{ kind: 'notAPuzzle', name: '337' }])
+  })
+
+  it("lists LinkedIn's reruns under every number they ran as, being the same Puzzle each time", () => {
+    const catalog = buildLinkedInCatalog(
+      [
+        { name: '72', text: OTHER_FOUR },
+        { name: '113', text: OTHER_FOUR },
+      ],
+      new Set(),
+    )
+
+    expect(catalog.puzzles.map((entry) => entry.number)).toEqual([72, 113])
+    expect(catalog.puzzles[0]?.puzzle.id).toBe(catalog.puzzles[1]?.puzzle.id)
+    expect(catalog.problems).toEqual([])
+  })
+
+  it("leaves out a layout already among the author's own Puzzles", () => {
     const catalog = buildLinkedInCatalog(
       [
         { name: '5', text: FOUR },
         { name: '6', text: OTHER_FOUR },
-        { name: '7', text: OTHER_FOUR },
       ],
       new Set([FOUR_BY_FOUR.id]),
     )
 
     expect(catalog.puzzles.map((entry) => entry.number)).toEqual([6])
-    expect(catalog.problems).toEqual([
-      { kind: 'duplicate', name: '5' },
-      { kind: 'duplicate', name: '7' },
-    ])
+    expect(catalog.problems).toEqual([{ kind: 'duplicate', name: '5' }])
   })
 })
 

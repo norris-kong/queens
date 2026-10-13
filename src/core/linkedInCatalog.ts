@@ -1,3 +1,4 @@
+import type { DraftRules } from './draft.ts'
 import { readPuzzle } from './puzzleFile.ts'
 import type { Puzzle } from './types.ts'
 
@@ -25,6 +26,14 @@ export interface LinkedInCatalog {
 
 const LINKEDIN_NUMBER = /^[1-9]\d*$/
 
+/** LinkedIn's April Fools' puzzle of 2025 splits Regions on purpose; every other Puzzle keeps them whole. */
+const SPLIT_REGION_PUZZLES: ReadonlySet<number> = new Set([336])
+
+/** The Puzzle conditions a LinkedIn Puzzle is held to, given its number. */
+export function linkedInRules(number: number): DraftRules {
+  return { regionsMayBeSplit: SPLIT_REGION_PUZZLES.has(number) }
+}
+
 /** Whether a number can be one of LinkedIn's: a whole number from 1 up. */
 export function isLinkedInNumber(number: number): boolean {
   return Number.isSafeInteger(number) && number >= 1
@@ -41,31 +50,25 @@ type Checked = { readonly ok: true; readonly entry: LinkedInEntry } | { readonly
 function checkFile(file: LinkedInFile): Checked {
   const number = file.name === file.name.trim() ? parseLinkedInNumber(file.name) : null
   if (number === null) return { ok: false, problem: { kind: 'invalidName', name: file.name } }
-  const read = readPuzzle(file.text)
+  const read = readPuzzle(file.text, linkedInRules(number))
   if (!read.ok) return { ok: false, problem: { kind: read.reason, name: file.name } }
   return { ok: true, entry: { number, puzzle: read.puzzle } }
 }
 
 /**
- * Builds the LinkedIn Puzzles in LinkedIn's order. Files that are not valid Puzzles, or that repeat
- * a layout already among `takenIds` (the author's own Puzzles) or an earlier LinkedIn Puzzle, are
- * left out and reported.
+ * Builds the LinkedIn Puzzles in LinkedIn's order. LinkedIn has rerun some puzzles, so a layout may
+ * appear under several numbers, all the same Puzzle. Files that are not valid Puzzles, or that
+ * repeat one of `takenIds` (the author's own Puzzles), are left out and reported.
  */
 export function buildLinkedInCatalog(files: readonly LinkedInFile[], takenIds: ReadonlySet<string>): LinkedInCatalog {
   const checked = files.map(checkFile)
   const entries = checked.flatMap((check) => (check.ok ? [check.entry] : [])).sort((a, b) => a.number - b.number)
-  const problems = checked.flatMap((check) => (check.ok ? [] : [check.problem]))
-  const seen = new Set(takenIds)
-  const puzzles: LinkedInEntry[] = []
-  for (const entry of entries) {
-    if (seen.has(entry.puzzle.id)) {
-      problems.push({ kind: 'duplicate', name: String(entry.number) })
-      continue
-    }
-    seen.add(entry.puzzle.id)
-    puzzles.push(entry)
+  const invalid = checked.flatMap((check) => (check.ok ? [] : [check.problem]))
+  const copies = entries.filter((entry) => takenIds.has(entry.puzzle.id))
+  return {
+    puzzles: entries.filter((entry) => !takenIds.has(entry.puzzle.id)),
+    problems: [...invalid, ...copies.map((entry) => ({ kind: 'duplicate' as const, name: String(entry.number) }))],
   }
-  return { puzzles, problems }
 }
 
 /** The number after the highest one stored: where the next day's LinkedIn Puzzle usually goes. */

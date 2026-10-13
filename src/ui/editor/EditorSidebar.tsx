@@ -89,7 +89,7 @@ export function EditorSidebar({ current, size, collection }: EditorSidebarProps)
           title={text.linkedInHeading(linkedInLibrary.puzzles.length)}
           open={openGroup === 'linkedIn'}
           chips={linkedInLibrary.puzzles.map((entry) => ({
-            key: entry.puzzle.id,
+            key: String(entry.number),
             number: entry.number,
             label: text.linkedInLabel(entry.number),
             route: { page: 'editor', linkedIn: entry.number },

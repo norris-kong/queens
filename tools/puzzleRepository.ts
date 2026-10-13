@@ -1,9 +1,9 @@
 import { mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import type { FileRef, PuzzleFile } from '../src/core/catalog.ts'
-import type { DraftProblem } from '../src/core/draft.ts'
+import type { DraftProblem, DraftRules } from '../src/core/draft.ts'
 import { puzzleId } from '../src/core/identity.ts'
-import { isLinkedInNumber, type LinkedInFile } from '../src/core/linkedInCatalog.ts'
+import { isLinkedInNumber, type LinkedInFile, linkedInRules } from '../src/core/linkedInCatalog.ts'
 import { LINKEDIN_FOLDER, PUZZLE_EXTENSION, readPuzzle, SIZE_FOLDER, sizeFolder } from '../src/core/puzzleFile.ts'
 import { formatPuzzle, type ParseError, parsePuzzle } from '../src/core/puzzleFormat.ts'
 import { isValidPuzzleName, samePuzzleName } from '../src/core/puzzleName.ts'
@@ -60,8 +60,8 @@ function isMissing(error: unknown): boolean {
 }
 
 /** Reads a request's text as the game would, refusing anything that is not a valid Puzzle. */
-function readRequestPuzzle(text: string): Checked {
-  const read = readPuzzle(text)
+function readRequestPuzzle(text: string, rules: DraftRules = {}): Checked {
+  const read = readPuzzle(text, rules)
   if (read.ok) return { ok: true, puzzle: read.puzzle }
   return read.reason === 'unreadable'
     ? { ok: false, error: { kind: 'unreadable', error: read.error } }
@@ -122,10 +122,8 @@ async function listPuzzles(root: string): Promise<PuzzleFile[]> {
 }
 
 /** A LinkedIn Puzzle already stored with this layout, as an error to report. */
-async function linkedInCopy(root: string, puzzle: Puzzle, except?: number): Promise<RepositoryError | null> {
-  const copy = (await listFolder(root, LINKEDIN_FOLDER)).find(
-    (file) => file.name !== String(except) && storedId(file) === puzzle.id,
-  )
+async function linkedInCopy(root: string, puzzle: Puzzle): Promise<RepositoryError | null> {
+  const copy = (await listFolder(root, LINKEDIN_FOLDER)).find((file) => storedId(file) === puzzle.id)
   return copy ? { kind: 'linkedInDuplicate', number: Number(copy.name) } : null
 }
 
@@ -164,14 +162,15 @@ async function removePuzzle(root: string, ref: FileRef): Promise<RepositoryResul
   return OK
 }
 
-/** Why this LinkedIn request clashes with what is stored, if it does. */
+/**
+ * Why this LinkedIn request clashes with what is stored, if it does. Repeating another LinkedIn
+ * Puzzle is fine, as LinkedIn has rerun some; repeating one of the author's own is not.
+ */
 async function findLinkedInClash(root: string, request: LinkedInSaveRequest, puzzle: Puzzle): Promise<RepositoryError | null> {
   const { number, previousNumber } = request
   const stored = (await listFolder(root, LINKEDIN_FOLDER)).map((file) => file.name)
   if (previousNumber !== undefined && !stored.includes(String(previousNumber))) return { kind: 'notFound' }
   if (number !== previousNumber && stored.includes(String(number))) return { kind: 'numberTaken' }
-  const linkedIn = await linkedInCopy(root, puzzle, previousNumber)
-  if (linkedIn) return linkedIn
   const own = (await listPuzzles(root)).find((file) => storedId(file) === puzzle.id)
   return own ? { kind: 'duplicate', sameAs: { size: own.size, name: own.name } } : null
 }
@@ -181,7 +180,7 @@ async function saveLinkedInPuzzle(root: string, request: LinkedInSaveRequest): P
   if (!isLinkedInNumber(number) || (previousNumber !== undefined && !isLinkedInNumber(previousNumber))) {
     return failure({ kind: 'invalidNumber' })
   }
-  const checked = readRequestPuzzle(request.text)
+  const checked = readRequestPuzzle(request.text, linkedInRules(number))
   if (!checked.ok) return failure(checked.error)
   const clash = await findLinkedInClash(root, request, checked.puzzle)
   if (clash) return failure(clash)

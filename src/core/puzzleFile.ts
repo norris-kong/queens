@@ -1,4 +1,4 @@
-import { type DraftProblem, inspectDraft } from './draft.ts'
+import { type DraftProblem, type DraftRules, inspectDraft } from './draft.ts'
 import { type ParseError, parsePuzzle } from './puzzleFormat.ts'
 import type { Puzzle } from './types.ts'
 
@@ -18,10 +18,10 @@ export type ReadPuzzleResult =
   | { readonly ok: false; readonly reason: 'notAPuzzle'; readonly problems: readonly DraftProblem[] }
 
 /** Reads Puzzle-file text into a Puzzle, or says why it is not one. */
-export function readPuzzle(text: string): ReadPuzzleResult {
+export function readPuzzle(text: string, rules: DraftRules = {}): ReadPuzzleResult {
   const parsed = parsePuzzle(text)
   if (!parsed.ok) return { ok: false, reason: 'unreadable', error: parsed.error }
-  const inspection = inspectDraft(parsed.grid)
+  const inspection = inspectDraft(parsed.grid, rules)
   if (!inspection.valid) return { ok: false, reason: 'notAPuzzle', problems: inspection.problems }
   return { ok: true, puzzle: inspection.puzzle }
 }

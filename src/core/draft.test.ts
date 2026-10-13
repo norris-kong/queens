@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { inspectDraft } from './draft.ts'
 import { parsePuzzle } from './puzzleFormat.ts'
+import { LINKEDIN_336 } from './testing.ts'
 import type { DraftGrid } from './types.ts'
 
 function grid(text: string): DraftGrid {
@@ -83,6 +84,18 @@ describe('inspectDraft', () => {
     expect(inspection).toEqual({
       valid: false,
       problems: [{ kind: 'disconnectedRegions', regions: [0, 1] }, { kind: 'noSolution' }],
+    })
+  })
+
+  it('accepts split Regions only when the rules allow them, still asking for exactly one Solution', () => {
+    expect(inspectDraft(grid(LINKEDIN_336))).toMatchObject({
+      valid: false,
+      problems: [{ kind: 'disconnectedRegions', regions: [0, 1] }],
+    })
+    expect(inspectDraft(grid(LINKEDIN_336), { regionsMayBeSplit: true })).toMatchObject({ valid: true })
+    expect(inspectDraft(grid('ABCC\nBACC\nDDDD\nDDDD'), { regionsMayBeSplit: true })).toEqual({
+      valid: false,
+      problems: [{ kind: 'noSolution' }],
     })
   })
 

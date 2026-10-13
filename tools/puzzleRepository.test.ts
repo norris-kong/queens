@@ -2,6 +2,7 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { LINKEDIN_336 } from '../src/core/testing.ts'
 import { createPuzzleRepository, type PuzzleRepository } from './puzzleRepository.ts'
 
 const FOUR = 'CABB\nCCBB\nCCDD\nDDDD\n'
@@ -168,6 +169,14 @@ describe('LinkedIn Puzzles', () => {
     expect(await repository.listLinkedIn()).toEqual([])
   })
 
+  it("saves #336, LinkedIn's April Fools' puzzle, with its split Regions, but no other number with them", async () => {
+    expect(await repository.saveLinkedIn({ number: 336, text: LINKEDIN_336 })).toEqual({ ok: true })
+    expect(await repository.saveLinkedIn({ number: 337, text: LINKEDIN_336 })).toMatchObject({
+      ok: false,
+      error: { kind: 'notAPuzzle' },
+    })
+  })
+
   it('refuses a number already used by another LinkedIn Puzzle', async () => {
     await repository.saveLinkedIn({ number: 523, text: FOUR })
 
@@ -177,13 +186,11 @@ describe('LinkedIn Puzzles', () => {
     })
   })
 
-  it('refuses a copy of another LinkedIn Puzzle, naming its number', async () => {
-    await repository.saveLinkedIn({ number: 523, text: FOUR })
+  it('saves a rerun of an earlier LinkedIn Puzzle under its own number, as LinkedIn ran it again', async () => {
+    await repository.saveLinkedIn({ number: 72, text: FOUR })
 
-    expect(await repository.saveLinkedIn({ number: 524, text: FOUR })).toEqual({
-      ok: false,
-      error: { kind: 'linkedInDuplicate', number: 523 },
-    })
+    expect(await repository.saveLinkedIn({ number: 113, text: FOUR })).toEqual({ ok: true })
+    expect(await repository.saveLinkedIn({ number: 113, previousNumber: 113, text: FOUR })).toEqual({ ok: true })
   })
 
   it("refuses a copy of one of the author's own Puzzles", async () => {

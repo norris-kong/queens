@@ -17,3 +17,6 @@ export function puzzleFrom(text: string): Puzzle {
  *   D D D D
  */
 export const FOUR_BY_FOUR = puzzleFrom('CABB\nCCBB\nCCDD\nDDDD')
+
+/** LinkedIn #336, its April Fools' puzzle of 2025: Regions A and B are each split in two, on purpose. */
+export const LINKEDIN_336 = 'EEEEEBEEE\nEEEEEEEFE\nEECEEEEEE\nHEEEAEEEE\nEEEEEEDEE\nEEEEEEEEA\nEEEEEBEEE\nEEEGEEEEE\nEIEEEEEEE\n'

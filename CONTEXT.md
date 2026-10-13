@@ -13,7 +13,7 @@ _Avoid_: Map, layout, stage
 _Avoid_: Filename, title, ID
 
 **LinkedIn Puzzle**（LinkedIn 題目）:
-出自 LinkedIn Queens 每日題目的 Puzzle，以 LinkedIn 原本的編號稱呼（例如 LinkedIn #250），與作者自己出的 Puzzle 分開陳列，並標註出處。
+出自 LinkedIn Queens 每日題目的 Puzzle，以 LinkedIn 原本的編號稱呼（例如 LinkedIn #250），與作者自己出的 Puzzle 分開陳列，並標註出處。LinkedIn 重出過的題目在每個編號下各列一次，它們是同一個 Puzzle。唯一的例外規則是 2025 年愚人節的 #336：它的 Region 刻意分成不相連的幾塊，其他條件照舊。
 _Avoid_: Imported puzzle, archive puzzle
 
 **Daily Puzzle**（每日題目）:

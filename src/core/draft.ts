@@ -12,6 +12,12 @@ export type DraftProblem =
   | { readonly kind: 'noSolution' }
   | { readonly kind: 'multipleSolutions'; readonly solutions: readonly [Solution, Solution] }
 
+/** Exceptions to the Puzzle conditions that a particular Puzzle is allowed. */
+export interface DraftRules {
+  /** Regions may be split into parts that do not touch; only LinkedIn's April Fools' puzzle does this. */
+  readonly regionsMayBeSplit?: boolean
+}
+
 export type DraftInspection =
   | { readonly valid: true; readonly puzzle: Puzzle }
   | { readonly valid: false; readonly problems: readonly DraftProblem[] }
@@ -58,10 +64,13 @@ function findDisconnectedRegions(draft: DraftGrid): RegionId[] {
 }
 
 /** Problems with how Cells are assigned to Regions. Only the first two keep Solutions from being counted. */
-function findLayoutProblems(draft: DraftGrid): { readonly blocking: DraftProblem[]; readonly disconnected: DraftProblem[] } {
+function findLayoutProblems(
+  draft: DraftGrid,
+  rules: DraftRules,
+): { readonly blocking: DraftProblem[]; readonly disconnected: DraftProblem[] } {
   const unassigned = findUnassignedCells(draft)
   const missing = findMissingRegions(draft)
-  const disconnected = findDisconnectedRegions(draft)
+  const disconnected = rules.regionsMayBeSplit ? [] : findDisconnectedRegions(draft)
   return {
     blocking: [
       ...(unassigned.length > 0 ? [{ kind: 'unassignedCells', cells: unassigned } as const] : []),
@@ -80,13 +89,14 @@ function solutionProblems(solutions: readonly Solution[]): DraftProblem[] {
 /**
  * Checks a Draft against every Puzzle condition and, when it meets them all, returns the Puzzle.
  * Solutions are counted as soon as every Cell is assigned and all N Regions are used, even if a
- * Region is still split, so the author sees both problems at once.
+ * Region is still split, so the author sees both problems at once. `rules` waives a condition for
+ * the rare Puzzle allowed to break it.
  */
-export function inspectDraft(draft: DraftGrid): DraftInspection {
+export function inspectDraft(draft: DraftGrid, rules: DraftRules = {}): DraftInspection {
   const size = draft.length
   if (size < MIN_SIZE || size > MAX_SIZE) return { valid: false, problems: [{ kind: 'sizeOutOfRange', size }] }
 
-  const layout = findLayoutProblems(draft)
+  const layout = findLayoutProblems(draft, rules)
   if (layout.blocking.length > 0) return { valid: false, problems: [...layout.blocking, ...layout.disconnected] }
 
   const regions = draft as RegionGrid

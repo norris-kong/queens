@@ -15,7 +15,7 @@ export function LinkedInPage() {
       <p className="muted">{strings.linkedInNote}</p>
       <ul className="puzzle-list">
         {linkedInLibrary.puzzles.map((entry) => (
-          <li key={entry.puzzle.id}>
+          <li key={entry.number}>
             <PuzzleLink
               href={routeHash({ page: 'linkedInPlay', number: entry.number })}
               number={entry.number}
