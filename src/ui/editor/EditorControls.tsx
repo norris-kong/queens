@@ -95,7 +95,7 @@ export function DraftFields({ editor }: { readonly editor: DraftEditor }) {
 }
 
 export function RegionPalette({ editor }: { readonly editor: DraftEditor }) {
-  const colors = boardStyle(collectionLook(editor.collection)).regionColors
+  const tones = boardStyle(collectionLook(editor.collection)).regionTones
   return (
     <div className="palette" role="toolbar">
       {Array.from({ length: editor.size }, (_, region) => (
@@ -105,7 +105,7 @@ export function RegionPalette({ editor }: { readonly editor: DraftEditor }) {
           className="swatch"
           aria-pressed={editor.brush === region}
           aria-label={text.regionSwatch(regionLetter(region))}
-          style={{ '--swatch': colors[region] } as CSSProperties}
+          style={{ '--swatch': tones[region]?.base } as CSSProperties}
           onClick={() => editor.setBrush(region)}
         >
           {regionLetter(region)}

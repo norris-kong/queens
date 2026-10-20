@@ -29,10 +29,16 @@ export function useStroke(size: number, handlers: StrokeHandlers, disabled: bool
   function cellAtPoint(x: number, y: number): Coord | null {
     const board = boardRef.current
     if (!board || board.clientWidth === 0) return null
-    // Measure inside the board's border, where the Cells are.
+    // Measure inside the board's border and padding, where the Cells are.
+    const style = getComputedStyle(board)
+    const padding = (side: string) => Number.parseFloat(style.getPropertyValue(`padding-${side}`)) || 0
     const rect = board.getBoundingClientRect()
-    const col = Math.floor(((x - rect.left - board.clientLeft) / board.clientWidth) * size)
-    const row = Math.floor(((y - rect.top - board.clientTop) / board.clientHeight) * size)
+    const left = rect.left + board.clientLeft + padding('left')
+    const top = rect.top + board.clientTop + padding('top')
+    const width = board.clientWidth - padding('left') - padding('right')
+    const height = board.clientHeight - padding('top') - padding('bottom')
+    const col = Math.floor(((x - left) / width) * size)
+    const row = Math.floor(((y - top) / height) * size)
     return row >= 0 && row < size && col >= 0 && col < size ? { row, col } : null
   }
 

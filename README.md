@@ -42,11 +42,14 @@ in Cherry Bomb One, with each Level's colours set in `src/ui/levelArt.ts`.
 
 ### Board look
 
-Every Board splits its Regions with thick black lines, so colour-blind players never have to tell
-Regions apart by colour. The game's own Puzzles round those lines where they turn a corner, draw
-dashed Cell lines only inside Regions, and ring the Board in its Level's colours. LinkedIn Puzzles
-keep LinkedIn's look: its colours, square corners and a thin line between every pair of Cells. Both
-palettes live in `src/config.ts`, and `src/ui/look.ts` says which look uses what.
+No Board asks players to tell Regions apart by colour alone, so colour-blind players can play. The
+game's own Puzzles set each Cell as a jelly sweet in its Region's colour: a rounded tile, thick along
+its bottom and shining along its top edge, in a tray of a deeper shade. Each Region is rimmed in its
+own deepest shade, dark enough to see by lightness alone, and the Board is ringed in its Level's
+colours. LinkedIn Puzzles keep LinkedIn's look: its colours on flat Cells, a thin line between every
+pair, and thick black lines between Regions. Both palettes live in `src/config.ts`;
+`src/ui/regionTones.ts` works out the deeper shades, `src/ui/regionRims.ts` where the rims run, and
+`src/ui/look.ts` which look uses what.
 
 ### Daily Puzzles
 

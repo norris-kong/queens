@@ -19,8 +19,10 @@ test("a player finds LinkedIn's Puzzles apart from the others, credited, and pla
 
   await page.locator(`a[href="#/linkedin/${first.number}"]`).click()
   await expect(page.getByRole('heading', { name: `LinkedIn #${first.number}` })).toBeVisible()
-  // LinkedIn's Puzzles keep LinkedIn's look.
+  // LinkedIn's Puzzles keep LinkedIn's look: flat Cells and black lines between Regions.
   await expect(page.locator('.board')).toHaveClass(/\blook-linkedIn\b/)
+  await expect(page.locator('.board .tile')).toHaveCount(0)
+  await expect(page.locator('.board .region-lines')).toHaveCount(1)
   for (const [row, col] of first.puzzle.solution.entries()) {
     const cell = page.locator(`[data-row="${row}"][data-col="${col}"]`)
     await cell.click()

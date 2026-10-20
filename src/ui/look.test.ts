@@ -3,17 +3,18 @@ import { LINKEDIN_REGION_COLORS, REGION_COLORS } from '../config.ts'
 import { boardStyle, collectionLook } from './look.ts'
 
 describe('look', () => {
-  it("draws the game's own Puzzles in its own colours, with rounded Region corners and Cell lines only inside Regions", () => {
+  it("draws the game's own Puzzles in its own colours, each Cell a raised tile", () => {
     const style = boardStyle('level')
 
-    expect(style.regionColors).toBe(REGION_COLORS)
-    expect(style.cornerRadius).toBeGreaterThan(0)
-    expect(style.cornerRadius).toBeLessThanOrEqual(0.5)
-    expect(style.cellLines).toBe('withinRegions')
+    expect(style.regionTones.map((tones) => tones.base)).toEqual(REGION_COLORS)
+    expect(style.tiles).toBe(true)
   })
 
-  it('draws LinkedIn Puzzles as LinkedIn does: its colours, square corners and a line between every pair of Cells', () => {
-    expect(boardStyle('linkedIn')).toEqual({ regionColors: LINKEDIN_REGION_COLORS, cornerRadius: 0, cellLines: 'all' })
+  it('draws LinkedIn Puzzles as LinkedIn does: its colours, on flat Cells', () => {
+    const style = boardStyle('linkedIn')
+
+    expect(style.regionTones.map((tones) => tones.base)).toEqual(LINKEDIN_REGION_COLORS)
+    expect(style.tiles).toBe(false)
   })
 
   it('gives each collection its look', () => {

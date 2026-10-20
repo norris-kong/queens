@@ -1,18 +1,23 @@
-import { LINKEDIN_REGION_COLORS, REGION_COLORS, REGION_CORNER_RADIUS } from '../config.ts'
-import type { ShapeStyle } from './boardShapes.ts'
+import { LINKEDIN_REGION_COLORS, REGION_COLORS } from '../config.ts'
+import { type RegionTones, regionTones } from './regionTones.ts'
 import type { Collection } from './routes.ts'
 
 /** How a Puzzle is drawn: in the game's own look, or, for LinkedIn Puzzles, as LinkedIn draws it. */
 export type Look = 'level' | 'linkedIn'
 
-export interface BoardStyle extends ShapeStyle {
-  /** Region colours by Region letter, A first. */
-  readonly regionColors: readonly string[]
+export interface BoardStyle {
+  /** Each Region's colours, by Region letter, A first. */
+  readonly regionTones: readonly RegionTones[]
+  /**
+   * Is each Cell a raised tile, with each Region rimmed in its own deep shade? Or is each Cell flat,
+   * with black lines between Regions, as on LinkedIn?
+   */
+  readonly tiles: boolean
 }
 
 const BOARD_STYLES: Readonly<Record<Look, BoardStyle>> = {
-  level: { regionColors: REGION_COLORS, cornerRadius: REGION_CORNER_RADIUS, cellLines: 'withinRegions' },
-  linkedIn: { regionColors: LINKEDIN_REGION_COLORS, cornerRadius: 0, cellLines: 'all' },
+  level: { regionTones: REGION_COLORS.map(regionTones), tiles: true },
+  linkedIn: { regionTones: LINKEDIN_REGION_COLORS.map(regionTones), tiles: false },
 }
 
 export function boardStyle(look: Look): BoardStyle {

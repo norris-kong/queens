@@ -18,7 +18,6 @@
   --accent-text: #ffffff;
   --grid-line: #1f1f1f;
   --cell-line: rgb(31 31 31 / 35%);
-  --cell-dash: rgb(31 31 31 / 40%);
   --mark: #2b2b2b;
   --queen: #1f1f1f;
   --queen-conflict: #c81e1e;
@@ -27,7 +26,6 @@
   --unassigned: #cacaca;
   --radius: 12px;
   --gutter: 16px;
-  --ring-width: 8px;
 
   color-scheme: light dark;
   font-family:
@@ -168,15 +166,15 @@ a {
 
 /* ---------- Board ---------- */
 
-/* Holds the Board's place while a generated Puzzle is on its way, leaving room for its Level ring. */
+/* Holds the Board's place while a generated Puzzle is on its way. */
 .board-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: calc(100% - 2 * var(--ring-width));
+  width: 100%;
   max-width: 560px;
   aspect-ratio: 1;
-  margin: var(--ring-width) auto;
+  margin: 0 auto;
   border: 1px dashed var(--border);
   border-radius: var(--radius);
   color: var(--text-muted);
@@ -202,35 +200,111 @@ a {
   -webkit-touch-callout: none;
 }
 
-/* The game's own look: rounder, and ringed in the colours of the Board's Level. */
+/*
+ * The game's own look frames the Board in the colours of its Level: an outline, then a band of the
+ * Level's fill. The frame is rounded outside but square inside, since the padding is wide enough for
+ * the Cells' corners to clear the curve; the Regions' rims draw the edge of the Cells.
+ */
 .board.look-level {
-  width: calc(100% - 2 * var(--ring-width));
-  margin: var(--ring-width) auto;
+  padding: 5px;
+  border: 3px solid var(--ring-outline);
   border-radius: 16px;
-  box-shadow:
-    0 0 0 5px var(--ring-fill),
-    0 0 0 var(--ring-width) var(--ring-outline);
-}
-
-/* Region colours, under the Cells. */
-.region-areas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
+  background: var(--ring-fill);
 }
 
 .cell {
   position: relative;
   display: grid;
   place-items: center;
+  border-top: 1px solid var(--cell-line);
+  border-left: 1px solid var(--cell-line);
+  background: var(--region, var(--unassigned));
   cursor: pointer;
   outline: none;
 }
 
-/* Cell and Region lines, over the Cells. */
-.board-lines {
+.cell.edge-top {
+  border-top: none;
+}
+
+.cell.edge-left {
+  border-left: none;
+}
+
+/*
+ * The game's own look sets each Cell as a jelly sweet in a tray of its Region's deeper shade: a
+ * rounded tile, thick along its bottom and shining along its top edge. The tray showing between the
+ * tiles marks out the Cells, so there are no Cell lines. Instead of black lines between Regions, each
+ * Region is rimmed in its own deepest shade, dark enough to see by lightness alone, and its tiles
+ * stand back from the rim. Sizes follow the Cell's own size (cqw/cqh).
+ */
+.look-level .cell {
+  --rim-width: 2px;
+
+  border: none;
+  background-color: var(--tray, var(--unassigned));
+  background-image: var(--rim-tl, none), var(--rim-tr, none), var(--rim-br, none), var(--rim-bl, none);
+  background-position: top left, top right, bottom right, bottom left;
+  background-size: var(--rim-width) var(--rim-width);
+  background-repeat: no-repeat;
+  box-shadow:
+    var(--rim-t, 0 0 transparent), var(--rim-r, 0 0 transparent),
+    var(--rim-b, 0 0 transparent), var(--rim-l, 0 0 transparent);
+  container-type: size;
+}
+
+.look-level .cell.rim-top {
+  --rim-t: inset 0 var(--rim-width) 0 var(--rim);
+  --back-t: var(--rim-width);
+}
+
+.look-level .cell.rim-right {
+  --rim-r: inset calc(-1 * var(--rim-width)) 0 0 var(--rim);
+  --back-r: var(--rim-width);
+}
+
+.look-level .cell.rim-bottom {
+  --rim-b: inset 0 calc(-1 * var(--rim-width)) 0 var(--rim);
+  --back-b: var(--rim-width);
+}
+
+.look-level .cell.rim-left {
+  --rim-l: inset var(--rim-width) 0 0 var(--rim);
+  --back-l: var(--rim-width);
+}
+
+/* Where a rim turns a corner around a Cell, the Cell fills in that corner. */
+.look-level .cell.rim-top-left {
+  --rim-tl: linear-gradient(var(--rim), var(--rim));
+}
+
+.look-level .cell.rim-top-right {
+  --rim-tr: linear-gradient(var(--rim), var(--rim));
+}
+
+.look-level .cell.rim-bottom-right {
+  --rim-br: linear-gradient(var(--rim), var(--rim));
+}
+
+.look-level .cell.rim-bottom-left {
+  --rim-bl: linear-gradient(var(--rim), var(--rim));
+}
+
+.tile {
+  position: absolute;
+  top: calc(4cqw + var(--back-t, 0px));
+  right: calc(4cqw + var(--back-r, 0px));
+  bottom: calc(4cqw + var(--back-b, 0px));
+  left: calc(4cqw + var(--back-l, 0px));
+  border-radius: 12cqw;
+  background: var(--region);
+  box-shadow:
+    inset 0 -10cqh 0 var(--side),
+    inset 0 5cqh 0 rgb(255 255 255 / 45%);
+  pointer-events: none;
+}
+
+.region-lines {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -239,42 +313,23 @@ a {
   pointer-events: none;
 }
 
-.board-lines path {
+.region-lines path {
   fill: none;
-  vector-effect: non-scaling-stroke;
-}
-
-.cell-lines {
-  stroke: var(--cell-line);
-  stroke-width: 1px;
-  shape-rendering: crispEdges;
-}
-
-/* Square caps, so lines meeting at a corner always join without a gap. */
-.region-lines {
   stroke: var(--grid-line);
   stroke-width: 3px;
   stroke-linecap: square;
+  vector-effect: non-scaling-stroke;
 }
 
-.look-level .cell-lines {
-  stroke: var(--cell-dash);
-  stroke-width: 1.5px;
-  stroke-dasharray: 3 4;
-}
-
-/* Round caps join the straight lines to the rounded corners without a seam. */
-.look-level .region-lines {
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
+/* An outline, so that it shows over a Cell's tile. */
 .cell:focus-visible {
-  box-shadow: inset 0 0 0 3px var(--accent);
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
 }
 
+/* The shorthand also resets the size the rims set for their corners, so the hatching fills the Cell. */
 .cell.is-unassigned {
-  background-image: repeating-linear-gradient(45deg, transparent 0 6px, rgb(128 128 128 / 18%) 6px 8px);
+  background: repeating-linear-gradient(45deg, transparent 0 6px, rgb(128 128 128 / 18%) 6px 8px) var(--unassigned);
 }
 
 .cell.is-striped::after {
@@ -286,7 +341,6 @@ a {
     transparent 0 7px,
     var(--conflict-stripe) 7px 10px
   );
-  border-radius: inherit;
   pointer-events: none;
 }
 
@@ -299,11 +353,6 @@ a {
   animation: hint-pulse 1.1s ease-in-out infinite;
   pointer-events: none;
   z-index: 1;
-}
-
-/* On a Cell a Region line curves around, the highlight follows the curve. */
-.cell.is-rounded.is-hinted::before {
-  border-radius: inherit;
 }
 
 @keyframes hint-pulse {
@@ -331,9 +380,16 @@ a {
   color: var(--mark);
 }
 
+/* LinkedIn's Marks, like its crowns, are drawn a little smaller. */
+.look-linkedIn .cell-icon.mark {
+  width: 30.6%;
+  height: 30.6%;
+}
+
+/* A Level logo, or LinkedIn's golden crown once Solved. */
 .cell-icon.queen {
-  width: 78%;
-  height: 78%;
+  width: 70.2%;
+  height: 70.2%;
   object-fit: contain;
   pointer-events: none;
   user-select: none;
@@ -346,8 +402,8 @@ a {
 
 /* LinkedIn's crown is drawn in one colour, so it simply turns red in a Conflict. */
 .cell-icon.queen.crown {
-  width: 70%;
-  height: 70%;
+  width: 63%;
+  height: 63%;
   color: var(--queen);
 }
 
