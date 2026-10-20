@@ -69,7 +69,7 @@ function handleKey(event: KeyboardEvent<HTMLDivElement>, cell: Coord, size: numb
 
 /** A Cell's colours for the stylesheet; an unassigned Cell sets none and shows the unassigned colour. */
 function toneStyle(tones: RegionTones | undefined): CSSProperties | undefined {
-  return tones && ({ '--region': tones.base, '--tray': tones.tray, '--side': tones.side, '--rim': tones.rim } as CSSProperties)
+  return tones && ({ '--region': tones.base, '--tray': tones.tray, '--rim': tones.rim } as CSSProperties)
 }
 
 interface BoardCellProps {
@@ -77,7 +77,7 @@ interface BoardCellProps {
   readonly region: RegionId | null
   /** Its Region's colours; none for an unassigned Cell. */
   readonly tones: RegionTones | undefined
-  /** Draw the Cell as a raised tile? An unassigned Cell stays flat either way. */
+  /** Draw the Cell as a rounded tile? An unassigned Cell stays plain either way. */
   readonly tile: boolean
   /** Where it carries its Region's rim, for looks that rim Regions instead of drawing lines between them. */
   readonly rims: readonly string[]

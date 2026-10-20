@@ -3,7 +3,7 @@ import { LINKEDIN_REGION_COLORS, REGION_COLORS } from '../config.ts'
 import { boardStyle, collectionLook } from './look.ts'
 
 describe('look', () => {
-  it("draws the game's own Puzzles in its own colours, each Cell a raised tile", () => {
+  it("draws the game's own Puzzles in its own colours, each Cell a rounded tile", () => {
     const style = boardStyle('level')
 
     expect(style.regionTones.map((tones) => tones.base)).toEqual(REGION_COLORS)

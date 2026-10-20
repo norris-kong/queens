@@ -1,10 +1,8 @@
-/** A Region's colour, and the deeper shades of the same hue that a raised tile of it is drawn with. */
+/** A Region's colour, and the deeper shades of the same hue that its tiles are drawn with. */
 export interface RegionTones {
   readonly base: string
   /** The tray the tiles sit in, showing between them: a little deeper. */
   readonly tray: string
-  /** A tile's thickness along its bottom edge: deeper still. */
-  readonly side: string
   /**
    * The rim around the Region: deepest, so that colour-blind players see where one Region ends and
    * the next begins by lightness alone.
@@ -14,7 +12,6 @@ export interface RegionTones {
 
 /** How much darker, and how much more colourful, each shade is than the Region colour, in OKLCH. */
 const TRAY = { lightness: -0.08, chroma: 0.025 }
-const SIDE = { lightness: -0.17, chroma: 0.05 }
 const RIM = { lightness: -0.32, chroma: 0.06 }
 
 /** Below this chroma a colour counts as grey, and its shades stay grey rather than take on a tint. */
@@ -52,5 +49,5 @@ function shade([lightness, chroma, hue]: readonly [number, number, number], step
 export function regionTones(hex: string): RegionTones {
   if (!HEX.test(hex)) throw new Error(`Region colours must be #rrggbb, not "${hex}"`)
   const color = toOklch(hex)
-  return { base: hex, tray: shade(color, TRAY), side: shade(color, SIDE), rim: shade(color, RIM) }
+  return { base: hex, tray: shade(color, TRAY), rim: shade(color, RIM) }
 }

@@ -232,11 +232,11 @@ a {
 }
 
 /*
- * The game's own look sets each Cell as a jelly sweet in a tray of its Region's deeper shade: a
- * rounded tile, thick along its bottom and shining along its top edge. The tray showing between the
- * tiles marks out the Cells, so there are no Cell lines. Instead of black lines between Regions, each
- * Region is rimmed in its own deepest shade, dark enough to see by lightness alone, and its tiles
- * stand back from the rim. Sizes follow the Cell's own size (cqw/cqh).
+ * The game's own look sets each Cell as a flat, rounded square tile in a tray of its Region's deeper
+ * shade. The tray showing between the tiles marks out the Cells, so there are no Cell lines. Instead
+ * of black lines between Regions, each Region is rimmed in its own deepest shade, dark enough to see
+ * by lightness alone, and its tiles stand back from the rim. Sizes follow the Cell's own size
+ * (cqw/cqh).
  */
 .look-level .cell {
   --rim-width: 2px;
@@ -298,9 +298,6 @@ a {
   left: calc(4cqw + var(--back-l, 0px));
   border-radius: 12cqw;
   background: var(--region);
-  box-shadow:
-    inset 0 -10cqh 0 var(--side),
-    inset 0 5cqh 0 rgb(255 255 255 / 45%);
   pointer-events: none;
 }
 

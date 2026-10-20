@@ -9,8 +9,8 @@ export interface BoardStyle {
   /** Each Region's colours, by Region letter, A first. */
   readonly regionTones: readonly RegionTones[]
   /**
-   * Is each Cell a raised tile, with each Region rimmed in its own deep shade? Or is each Cell flat,
-   * with black lines between Regions, as on LinkedIn?
+   * Is each Cell a rounded tile, with each Region rimmed in its own deep shade? Or does each Cell
+   * fill its square, with black lines between Regions, as on LinkedIn?
    */
   readonly tiles: boolean
 }

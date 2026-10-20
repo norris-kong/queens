@@ -13,22 +13,24 @@ describe('regionTones', () => {
     expect(regionTones('#c7afe7').base).toBe('#c7afe7')
   })
 
-  it('deepens the tray between tiles, the side of a tile further, and the rim most, without changing the hue', () => {
+  it('gives a Region just its colour, the tray between its tiles and its rim', () => {
+    expect(Object.keys(regionTones('#c7afe7'))).toEqual(['base', 'tray', 'rim'])
+  })
+
+  it('deepens the tray between tiles, and the rim further, without changing the hue', () => {
     const tones = regionTones('#ff0000')
     const [trayL, , trayH] = parse(tones.tray)
-    const [sideL, , sideH] = parse(tones.side)
     const [rimL, , rimH] = parse(tones.rim)
 
     expect(trayL).toBeCloseTo(0.628 - 0.08, 2)
-    expect(sideL).toBeLessThan(trayL)
-    expect(rimL).toBeLessThan(sideL)
-    expect([trayH, sideH, rimH].every((hue) => Math.abs(hue - 29.23) < 0.05)).toBe(true)
+    expect(rimL).toBeLessThan(trayL)
+    expect([trayH, rimH].every((hue) => Math.abs(hue - 29.23) < 0.05)).toBe(true)
   })
 
   it('keeps greys grey instead of tinting them', () => {
     const tones = regionTones('#f3f3f3')
 
-    expect([tones.tray, tones.side, tones.rim].every((tone) => parse(tone)[1] < 0.001)).toBe(true)
+    expect([tones.tray, tones.rim].every((tone) => parse(tone)[1] < 0.001)).toBe(true)
   })
 
   it('makes the rim dark enough to stand out from the tray even on the palest Region, without colour', () => {
