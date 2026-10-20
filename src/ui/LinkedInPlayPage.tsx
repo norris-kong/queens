@@ -24,7 +24,7 @@ export function LinkedInPlayPage({ number }: { readonly number: number }) {
           key={entry.puzzle.id}
           puzzle={entry.puzzle}
           slot={saveSlot(progressStore, entry.puzzle.id, entry.puzzle)}
-          queenLook="linkedIn"
+          look="linkedIn"
           next={next ? { label: strings.nextPuzzle, go: () => navigate({ page: 'linkedInPlay', number: next.number }) } : undefined}
           solvedNote={next ? undefined : strings.lastPuzzle}
         />

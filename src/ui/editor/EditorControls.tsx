@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react'
-import { REGION_COLORS } from '../../config.ts'
 import { regionLetter } from '../../core/puzzleFormat.ts'
 import { MAX_SIZE, MIN_SIZE } from '../../core/rules.ts'
+import { boardStyle, collectionLook } from '../look.ts'
 import type { Collection } from './editorTarget.ts'
 import { editorStrings as text } from './editorStrings.ts'
 import type { DraftEditor } from './useDraftEditor.ts'
@@ -95,6 +95,7 @@ export function DraftFields({ editor }: { readonly editor: DraftEditor }) {
 }
 
 export function RegionPalette({ editor }: { readonly editor: DraftEditor }) {
+  const colors = boardStyle(collectionLook(editor.collection)).regionColors
   return (
     <div className="palette" role="toolbar">
       {Array.from({ length: editor.size }, (_, region) => (
@@ -104,7 +105,7 @@ export function RegionPalette({ editor }: { readonly editor: DraftEditor }) {
           className="swatch"
           aria-pressed={editor.brush === region}
           aria-label={text.regionSwatch(regionLetter(region))}
-          style={{ '--swatch': REGION_COLORS[region] } as CSSProperties}
+          style={{ '--swatch': colors[region] } as CSSProperties}
           onClick={() => editor.setBrush(region)}
         >
           {regionLetter(region)}

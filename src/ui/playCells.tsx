@@ -6,7 +6,8 @@ import type { CSSProperties } from 'react'
 import type { Coord, Puzzle } from '../core/types.ts'
 import { strings } from '../strings.ts'
 import type { CellView } from './BoardView.tsx'
-import { MarkIcon, QueenMark, type QueenLook } from './icons.tsx'
+import { MarkIcon, QueenMark } from './icons.tsx'
+import type { Look } from './look.ts'
 
 /** On a Solve, the Queens grow and settle back one row after another, this far apart. */
 const CELEBRATION_STAGGER_MS = 70
@@ -28,7 +29,7 @@ interface QueenDrawing {
   readonly className: string
   readonly size: number
   readonly row: number
-  readonly look: QueenLook
+  readonly look: Look
   readonly solved: boolean
 }
 
@@ -47,7 +48,7 @@ export function cellView(
   hint: Hint | null,
   solved: boolean,
   cell: Coord,
-  look: QueenLook = 'level',
+  look: Look = 'level',
 ): CellView {
   const state = board[cell.row]?.[cell.col]
   const id = key(cell)

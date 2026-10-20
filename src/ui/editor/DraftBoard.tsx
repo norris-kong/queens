@@ -3,11 +3,12 @@ import { regionLetter } from '../../core/puzzleFormat.ts'
 import type { Coord, RegionId } from '../../core/types.ts'
 import { strings } from '../../strings.ts'
 import { BoardView, type CellView } from '../BoardView.tsx'
-import { QueenMark, type QueenLook } from '../icons.tsx'
+import { QueenMark } from '../icons.tsx'
+import { collectionLook, type Look } from '../look.ts'
 import type { DraftEditor } from './useDraftEditor.ts'
 
 /** Overlays that help the author: the Solution when unique, two diverging Solutions when not. */
-function solutionOverlay(inspection: DraftInspection, cell: Coord, look: QueenLook): CellView['content'] {
+function solutionOverlay(inspection: DraftInspection, cell: Coord, look: Look): CellView['content'] {
   if (inspection.valid) {
     const isQueen = inspection.puzzle.solution[cell.row] === cell.col
     return isQueen ? <QueenMark size={inspection.puzzle.size} look={look} className="is-faint" /> : null
@@ -25,12 +26,13 @@ function disconnectedRegions(inspection: DraftInspection): ReadonlySet<RegionId>
 
 export function DraftBoard({ editor }: { readonly editor: DraftEditor }) {
   const disconnected = disconnectedRegions(editor.inspection)
+  const look = collectionLook(editor.collection)
 
   function renderCell(cell: Coord): CellView {
     const region = editor.shownDraft[cell.row]?.[cell.col] ?? null
     return {
       label: strings.cellLabel(cell.row, cell.col, region === null ? strings.cellStates.empty : regionLetter(region)),
-      content: solutionOverlay(editor.inspection, cell, editor.collection === 'linkedIn' ? 'linkedIn' : 'level'),
+      content: solutionOverlay(editor.inspection, cell, look),
       className: region !== null && disconnected.has(region) ? 'is-striped' : '',
     }
   }
@@ -39,6 +41,7 @@ export function DraftBoard({ editor }: { readonly editor: DraftEditor }) {
     <BoardView
       regions={editor.shownDraft}
       label={strings.boardLabel}
+      look={look}
       renderCell={renderCell}
       onTap={(cell) => editor.commitPaint([cell])}
       onPreview={editor.previewPaint}

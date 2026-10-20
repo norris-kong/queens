@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { strings } from '../../strings.ts'
+import { collectionLook } from '../look.ts'
 import { PlayScreen } from '../PlayScreen.tsx'
 import { routeHash } from '../routes.ts'
 import { DraftBoard } from './DraftBoard.tsx'
@@ -27,7 +28,7 @@ export default function EditorPage(stored: EditorTarget) {
           key={editor.inspection.puzzle.id}
           puzzle={editor.inspection.puzzle}
           slot={null}
-          queenLook={editor.collection === 'linkedIn' ? 'linkedIn' : 'level'}
+          look={collectionLook(editor.collection)}
         />
       </main>
     )

@@ -1,9 +1,7 @@
 import type { CSSProperties } from 'react'
 import solvedCrown from '../assets/linkedin/crown-solved.svg'
 import { levelArt } from './levelArt.ts'
-
-/** How Queens are drawn: as the Board's Level logo, or, on LinkedIn Puzzles, as LinkedIn's crown. */
-export type QueenLook = 'level' | 'linkedIn'
+import type { Look } from './look.ts'
 
 /** LinkedIn's crown, as drawn on its Boards during play. */
 const CROWN_PATH =
@@ -12,7 +10,8 @@ const CROWN_PATH =
 interface QueenMarkProps {
   /** The Board's Size, whose Level's logo the Queen wears in the `level` look. */
   readonly size: number
-  readonly look?: QueenLook
+  /** As the Board's Level logo, or, on LinkedIn Puzzles, as LinkedIn's crown. */
+  readonly look?: Look
   /** Is the Puzzle Solved? LinkedIn's crown then turns to its golden, animated one. */
   readonly solved?: boolean
   readonly className?: string

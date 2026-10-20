@@ -30,6 +30,8 @@ test("each Level's picture button opens its Puzzles, shown by number only", asyn
 
   await first.click()
   await expect(page.getByRole('heading', { name: 'Beginner 1', exact: true })).toBeVisible()
+  // The game's own Puzzles are drawn in its own look, not LinkedIn's.
+  await expect(page.locator('.board')).toHaveClass(/\blook-level\b/)
 })
 
 test('a player solves a Puzzle, sees its Queens celebrate, and finds it ticked in its Level', async ({ page }) => {
