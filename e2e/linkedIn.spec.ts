@@ -35,5 +35,10 @@ test("a player finds LinkedIn's Puzzles apart from the others, credited, and pla
 
   await expect(page.getByRole('heading', { name: `LinkedIn #${second.number}` })).toBeVisible()
   await page.getByRole('link', { name: '‹ LinkedIn 題目' }).click()
+  // The list opens on the Puzzles not yet Solved, so the one just finished is out of the way...
+  await expect(page.locator(`a[href="#/linkedin/${first.number}"]`)).toHaveCount(0)
+  await expect(page.locator(`a[href="#/linkedin/${second.number}"]`)).toBeVisible()
+  // ...and is still there, ticked, under "all".
+  await page.getByRole('button', { name: '全部' }).click()
   await expect(page.locator(`a[href="#/linkedin/${first.number}"]`)).toContainText('已通關')
 })

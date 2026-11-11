@@ -491,6 +491,30 @@ a {
   list-style: none;
 }
 
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.filter-tab {
+  min-height: 40px;
+  padding: 6px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filter-tab[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
 .puzzle-link {
   display: flex;
   align-items: center;

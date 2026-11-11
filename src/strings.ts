@@ -74,6 +74,9 @@ export const strings = {
   linkedInEntry: (count: number, solved: number) => `${count} 題 · 已通關 ${solved}`,
   linkedInNote:
     '這些題目出自 LinkedIn 的每日遊戲 Queens，版權屬於 LinkedIn，經由社群整理的 archivedqueens.com 與 awa.games 收集。本站是獨立的同好作品，與 LinkedIn、Microsoft 無關。',
+  linkedInFilterLabel: '顯示的題目',
+  linkedInFilters: { unsolved: '未通關', all: '全部' },
+  linkedInAllSolved: '所有題目都通關了！切換到「全部」可以重玩。',
   linkedInPuzzleTitle: (number: number) => `LinkedIn #${number}`,
   backToLinkedIn: '‹ LinkedIn 題目',
 
